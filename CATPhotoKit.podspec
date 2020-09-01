@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-kit of access local library
+kit of access local library in cat project, upload appstore
                        DESC
 
   s.homepage         = 'https://github.com/Huaixing/CATPhotoKit'
