@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '8.0'
+
+target 'CATPhotoKit_Example' do
+  pod 'CATPhotoKit', :path => '../'
+
+  target 'CATPhotoKit_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
