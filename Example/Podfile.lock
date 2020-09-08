@@ -1,5 +1,5 @@
 PODS:
-  - CATPhotoKit (0.1.0)
+  - CATPhotoKit (0.1.3)
 
 DEPENDENCIES:
   - CATPhotoKit (from `../`)
@@ -9,7 +9,7 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CATPhotoKit: f39bc243cf137104fc981de34a4555ff1ba3ef5a
+  CATPhotoKit: 7586ced660edfeae4dcb2b39ca9e6cda37798f58
 
 PODFILE CHECKSUM: 25fa69bc53b213e98296502cc0a7bf018b4440b2
 

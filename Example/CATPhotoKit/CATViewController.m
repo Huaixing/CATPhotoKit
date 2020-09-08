@@ -7,8 +7,11 @@
 //
 
 #import "CATViewController.h"
+#import <CATPhotoKit/CATPhotoKit.h>
 
 @interface CATViewController ()
+
+
 
 @end
 
@@ -17,13 +20,22 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view, typically from a nib.
+
+    UIButton *pickButton = [[UIButton alloc] initWithFrame:CGRectMake(100, 200, 100, 100)];
+    [pickButton setTitle:@"Pick" forState:UIControlStateNormal];
+    [pickButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    pickButton.backgroundColor = [UIColor yellowColor];
+    [self.view addSubview:pickButton];
+    [pickButton addTarget:self action:@selector(pickButtonDidClick) forControlEvents:UIControlEventTouchUpInside];
 }
 
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)pickButtonDidClick {
+    
+    CATAlbumViewController *album = [[CATAlbumViewController alloc] init];
+    
+    CATPhotoPickerController *pick = [[CATPhotoPickerController alloc] initWithRootViewController:album];
+    pick.modalPresentationStyle = UIModalPresentationFullScreen;
+    [self presentViewController:pick animated:YES completion:nil];
 }
 
 @end
