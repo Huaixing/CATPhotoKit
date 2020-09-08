@@ -57,7 +57,7 @@ typedef NS_ENUM(NSInteger, CATPhotoSortType) {
 
 + (instancetype)shareManager;
 
-- (void)fetchAlbumsWithHandler:(void(^)(NSArray<CATAlbum *> *albums))handler;
+- (void)fetchAlbumsWithAfterSmartAlbumUserLibraryHandler:(void(^)(NSArray<CATAlbum *> *albums))handler complete:(void(^)(NSArray<CATAlbum *> *albums))complete;
 - (void)fetchPhotosWithCollection:(PHAssetCollection *)colletion config:(CATPhotoFetchConfig *)config handler:(void(^)(NSArray<CATPhoto *> *photos))handler;
 
 - (void)requestAlbumThumbWithAlbum:(CATAlbum *)album targetSize:(CGSize)targetSize delegate:(id<CATPhotoDownLoadDelegate>)delegate;

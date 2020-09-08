@@ -15,9 +15,7 @@
 
 @interface CATAlbumViewController ()<UITableViewDataSource, UITableViewDelegate>
 
-/***/
-@property (nonatomic, strong) NSMutableArray *albums;
-/***/
+@property (nonatomic, strong) NSMutableArray<CATAlbum *> *albums;
 @property (nonatomic, strong) UITableView *albumTableView;
 
 /**loading*/
@@ -28,6 +26,14 @@
 @end
 
 @implementation CATAlbumViewController
+
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        
+    }
+    return self;
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -43,7 +49,11 @@
         __strong typeof(wself) sself = wself;
         if (!sself) return;
         if (status == PHAuthorizationStatusAuthorized) {
-            [[CATPhotoManager shareManager] fetchAlbumsWithHandler:^(NSArray<CATAlbum *> *albums) {
+            [[CATPhotoManager shareManager] fetchAlbumsWithAfterSmartAlbumUserLibraryHandler:^(NSArray<CATAlbum *> *albums) {
+                // 自动进入照片列表页面
+                [sself pushPhotoControllerAlbum:[albums firstObject] animated:NO];
+                
+            } complete:^(NSArray<CATAlbum *> *albums) {
                 
                 [sself.loadingView stopAnimating];
                 [sself.view addSubview:self.albumTableView];
@@ -66,7 +76,7 @@
 
 #pragma mark - Getter
 
-- (NSMutableArray *)albums {
+- (NSMutableArray<CATAlbum *> *)albums {
     if (!_albums) {
         _albums = [[NSMutableArray alloc] init];
     }
@@ -81,14 +91,12 @@
         _albumTableView.dataSource = self;
         if (@available(iOS 9.0, *)) {
             _albumTableView.cellLayoutMarginsFollowReadableWidth = NO;
-        } else {
-            // Fallback on earlier versions
         }
         _albumTableView.estimatedRowHeight = 0;
         _albumTableView.estimatedSectionHeaderHeight = 0;
         _albumTableView.estimatedSectionFooterHeight = 0;
         if (@available(iOS 11.0, *)) {
-//        _albumTableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+//            _albumTableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
         }
     }
     return _albumTableView;
@@ -110,11 +118,20 @@
 
 - (CATNoAuthorizedView *)authorizedDefaultView {
     if (!_authorizedDefaultView) {
-        _authorizedDefaultView = [[CATNoAuthorizedView alloc] initWithFrame:self.view.bounds iconName:nil message:@"的说法会计师大黄蜂科技大厦发了多少佛假动画的递交打回道德经复核耶耶大黄蜂科技大厦发了多少佛假动画的递交打回道德经复核耶耶大黄蜂科技大厦发了多少佛假动画的递交打回道德经复核耶耶大黄蜂科技大厦发了多少佛假动画的递交打回道德经复核耶耶大黄蜂科技大厦发了多少佛假动画的递交打回道德经复核耶耶大黄蜂科技大厦发了多少佛假动画的递交打回道德经复核耶耶耶"];
+        _authorizedDefaultView = [[CATNoAuthorizedView alloc] initWithFrame:self.view.bounds iconName:nil message:@"允许使用本地相册权限"];
     }
     return _authorizedDefaultView;
 }
 
+#pragma mark - Private
+- (void)pushPhotoControllerAlbum:(CATAlbum *)album animated:(BOOL)animated {
+    if (!album) {
+        return;
+    }
+    CATPhotoViewController *photoController = [[CATPhotoViewController alloc] init];
+    photoController.album = album;
+    [self.navigationController pushViewController:photoController animated:animated];
+}
 
 #pragma mark - UITableViewDatasource
 
@@ -147,13 +164,11 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-//    TestViewEmojiViewController *photoController = [[TestViewEmojiViewController alloc] init];
-//    [self.navigationController pushViewController:photoController animated:YES];
+    if (indexPath.row < self.albums.count) {
+        CATAlbum *album = [self.albums objectAtIndex:indexPath.row];
+        [self pushPhotoControllerAlbum:album animated:YES];
+    }
     
-    CATAlbum *album = [self.albums objectAtIndex:indexPath.row];
-    CATPhotoViewController *photoController = [[CATPhotoViewController alloc] init];
-    photoController.album = album;
-    [self.navigationController pushViewController:photoController animated:YES];
 }
 
 @end

@@ -8,11 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
-@class CATPhoto;
+@class CATPhoto, CATPhotoCell;
+
+@protocol CATPhotoCellDelegate <NSObject>
+
+@optional
+- (void)photoCell:(CATPhotoCell *)photoCell didSelectedPhoto:(CATPhoto *)photo;
+
+@end
 
 @interface CATPhotoCell : UICollectionViewCell
-/***/
-//@property (nonatomic, assign) NSUInteger index;
+
+@property (nonatomic, weak) id<CATPhotoCellDelegate> delegate;
 /**photo*/
 @property (nonatomic, strong) CATPhoto *photo;
 

@@ -8,6 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+@class CATPhotoPickerController, CATPhoto;
+
+@protocol CATPhotoPickerControllerDelegate <NSObject>
+
+@optional
+- (void)photoPickerController:(CATPhotoPickerController *)pickerController didSelectedPhotos:(NSArray<CATPhoto *> *)selectedPhotos;
+
+@end
 
 @interface CATPhotoPickerController : UINavigationController
 

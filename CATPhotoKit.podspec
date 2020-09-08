@@ -15,9 +15,9 @@ kit of access local library in cat project, upload appstore
 
   s.source_files = "CATPhotoKit/Classes/**/*.{h,m}"
   
-  # s.resource_bundles = {
-  #   'CATPhotoKit' => ['CATPhotoKit/Assets/*.png']
-  # }
+  s.resource_bundles = {
+    'CATPhotoKit' => ['CATPhotoKit/Assets/*.png']
+  }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'

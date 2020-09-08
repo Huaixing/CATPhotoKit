@@ -15,6 +15,29 @@
 static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
 
 
+/*
+ 1. synchronous = YES. 同步。只返回一张图片并且deliveryMode会忽略用户设置的值，直接设为 PHImageRequestOptionsDeliveryModeHighQualityFormat。
+    a. resizeMode: PHImageRequestOptionsResizeModeNone: 返回的是原图大小
+    b. resizeMode: PHImageRequestOptionsResizeModeFast: 当原图是压缩图时，会使用targetSize来最优解码图片，获得的图片大小可能比targetSize大
+    c. resizeMode: PHImageRequestOptionsResizeModeExact: 解压和Fast一样，但是返回的是指定targetSize的高质量图
+ 
+ 
+ 2. synchronous: NO. 异步。
+    a. deliveryMode: PHImageRequestOptionsDeliveryModeOpportunistic: 会返回多张图片
+        1). PHImageRequestOptionsResizeModeNone: 先返回低清的缩略图，再返回原图大小
+        2). PHImageRequestOptionsResizeModeFast: 先返回低清的缩略图，再返回的图片如 1-b 一样
+        3). PHImageRequestOptionsResizeModeExact: 先返回低清的缩略图，再返回的图片如 1-c一样
+ 
+    b. deliveryMode: PHImageRequestOptionsDeliveryModeHighQualityFormat: 只会返回一张高清图片
+        1). PHImageRequestOptionsResizeModeNone: 如 1-a 一样
+        2). PHImageRequestOptionsResizeModeFast: 如 1-b 一样
+        3). PHImageRequestOptionsResizeModeExact: 如 1-c一样
+ 
+    c. deliveryMode: PHImageRequestOptionsDeliveryModeFastFormat: 只会返回一张图片，并且可能是低清图
+        1). PHImageRequestOptionsResizeModeNone: 返回一张低清图
+        2). PHImageRequestOptionsResizeModeFast: 返回一张低清图
+        3). PHImageRequestOptionsResizeModeExact: 返回一张低清图
+ */
 
 @implementation CATPhotoFetchConfig
 
@@ -64,7 +87,7 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
 
 
 
-- (void)fetchAlbumsWithHandler:(void(^)(NSArray<CATAlbum *> *albums))handler {
+- (void)fetchAlbumsWithAfterSmartAlbumUserLibraryHandler:(void (^)(NSArray<CATAlbum *> *))handler complete:(void (^)(NSArray<CATAlbum *> *))complete {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
@@ -87,6 +110,12 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
                 }
             }
         }];
+        // 获取到本地相机胶卷后，返回出去，让外面做一些处理，如直接跳转至照片页面
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            if (handler) {
+                handler(localAlbums);
+            }
+        });
         // 其它智能相册
         PHFetchResult<PHAssetCollection *> *fetchRegularResult = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:options];
         [fetchRegularResult enumerateObjectsUsingBlock:^(PHAssetCollection * _Nonnull collection, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -125,8 +154,8 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
         }];
         
         dispatch_sync(dispatch_get_main_queue(), ^{
-            if (handler) {
-                handler(localAlbums);
+            if (complete) {
+                complete(localAlbums);
             }
         });
     });
@@ -238,11 +267,11 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
     
     PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
     options.synchronous = NO;
-    options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+    options.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
     options.resizeMode = PHImageRequestOptionsResizeModeExact;
     options.networkAccessAllowed = YES;
     
-    [[PHImageManager defaultManager] requestImageForAsset:photo.asset targetSize:size contentMode:PHImageContentModeAspectFit options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    [[PHImageManager defaultManager] requestImageForAsset:photo.asset targetSize:CGSizeMake(size.width * 1.5, size.height * 1.5) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"requestImageForAsset --- %@ --- identifier = %@", NSStringFromCGSize(result.size), photo.asset.localIdentifier);
             if (delegate && [delegate respondsToSelector:@selector(photoManagerDownLoadSuccess:result:identifier:)]) {
