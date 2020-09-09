@@ -9,9 +9,10 @@
 #import "CATViewController.h"
 #import <CATPhotoKit/CATPhotoKit.h>
 
-@interface CATViewController ()
+@interface CATViewController ()<UITextViewDelegate>
 
-
+/// textview
+@property (nonatomic, strong) UITextView *textView;
 
 @end
 
@@ -20,6 +21,18 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+//    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keybShow) name:UIKeyboardWillShowNotification object:nil];
+    
+//    _textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), 300)];
+//    _textView.backgroundColor = [UIColor redColor];
+//    _textView.font = [UIFont systemFontOfSize:18];
+//    _textView.alwaysBounceVertical = YES;
+//    _textView.layoutManager.allowsNonContiguousLayout = NO;
+//    _textView.contentInset = UIEdgeInsetsMake(0, 0, 100, 0);
+////    _textView.textContainerInset = UIEdgeInsetsMake(0, 0, 100, 0);
+//    [self.view addSubview:_textView];
+//    _textView.delegate = self;
 
     UIButton *pickButton = [[UIButton alloc] initWithFrame:CGRectMake(100, 200, 100, 100)];
     [pickButton setTitle:@"Pick" forState:UIControlStateNormal];
@@ -37,5 +50,12 @@
     pick.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:pick animated:YES completion:nil];
 }
+
+- (void)textViewDidChange:(UITextView *)textView {
+    
+    [textView scrollRangeToVisible:NSMakeRange(textView.selectedRange.location, 1)];
+}
+
+//- (voi)
 
 @end

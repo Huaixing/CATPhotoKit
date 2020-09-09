@@ -40,7 +40,9 @@
 
 #pragma mark - Public
 - (void)photoViewControllerDidFinishPickPhotos:(NSArray<CATPhoto *> *)photos {
-    
+    if (self.picker && [self.picker respondsToSelector:@selector(photoPickerController:didFinishPickPhotos:)]) {
+        [self.picker photoPickerController:self didFinishPickPhotos:photos];
+    }
 }
 
 

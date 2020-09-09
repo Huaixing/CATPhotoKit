@@ -17,7 +17,7 @@
 #import "CATPhotoSelectedBar.h"
 
 
-@interface CATPhotoViewController ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate, CATPhotoCellDelegate>
+@interface CATPhotoViewController ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate, CATPhotoCellDelegate, CATPhotoSelectedBarDelegate>
 /***/
 @property (nonatomic, strong) NSMutableArray<CATPhoto *> *photos;
 @property (nonatomic, strong) UICollectionView *collectionView;
@@ -53,6 +53,7 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     self.view.backgroundColor = [UIColor whiteColor];
     
     _selectedBar = [[CATPhotoSelectedBar alloc] init];
+    _selectedBar.delegate = self;
     [self.view addSubview:_selectedBar];
     CGFloat barHeight = 54 + _selectedBar.bottomMargin;
     _selectedBar.frame = CGRectMake(0, CGRectGetHeight(self.view.frame) - barHeight, CGRectGetWidth(self.view.frame), barHeight);
@@ -145,10 +146,19 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
         [self.seletedPhotos removeObject:photo];
     }
     _selectedBar.count = self.seletedPhotos.count;
-    
-//    if (self.navigationController && [self.navigationController respondsToSelector:@selector(photoViewControllerDidFinishPickPhotos:)]) {
-//        [self.navigationController performSelector:@selector(photoViewControllerDidFinishPickPhotos:) withObject:self.seletedPhotos];
-//    }
+}
+
+#pragma mark - CATPhotoSelectedBarDelegate
+- (void)photoSelectedBarDidClickDone:(CATPhotoSelectedBar *)seletedBar {
+    // 回传给导航栏，让导航栏跟外界交涉。最后的结果都将以导航栏的形式传给外界
+    if (self.navigationController) {
+        SEL selector = NSSelectorFromString(@"photoViewControllerDidFinishPickPhotos:");
+        if ([self.navigationController respondsToSelector:selector]) {
+            IMP imp = [self.navigationController methodForSelector:selector];
+            void (*func)(id, SEL, NSArray *) = (void *)imp;
+            func (self.navigationController, selector, self.seletedPhotos);
+        }
+    }
 }
 
 

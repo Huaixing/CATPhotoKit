@@ -42,6 +42,7 @@
         _doneButton.exclusiveTouch = YES;
         _doneButton.layer.cornerRadius = 4.0;
         _doneButton.clipsToBounds = YES;
+        [_doneButton addTarget:self action:@selector(doneButtonDidClick) forControlEvents:UIControlEventTouchUpInside];
         [_contentView addSubview:_doneButton];
         
         _textLabel = [[UILabel alloc] init];
@@ -128,10 +129,17 @@
 /// 选择栏底部留白，刘海屏适配
 - (CGFloat)bottomMargin {
     if (@available(iOS 11.0, *)) {
-        return [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;;
+        return [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;
     } else {
         // Fallback on earlier versions
         return 0.0;
+    }
+}
+
+#pragma mark - Action
+- (void)doneButtonDidClick {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(photoSelectedBarDidClickDone:)]) {
+        [self.delegate photoSelectedBarDidClickDone:self];
     }
 }
 @end

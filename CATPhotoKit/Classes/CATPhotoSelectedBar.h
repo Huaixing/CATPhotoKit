@@ -7,7 +7,20 @@
 
 #import <UIKit/UIKit.h>
 
+@class CATPhotoSelectedBar;
+
+@protocol CATPhotoSelectedBarDelegate <NSObject>
+
+@optional
+
+/// 点击done
+/// @param seletedBar self
+- (void)photoSelectedBarDidClickDone:(CATPhotoSelectedBar *)seletedBar;
+@end
+
 @interface CATPhotoSelectedBar : UIView
+
+@property (nonatomic, weak) id<CATPhotoSelectedBarDelegate> delegate;
 
 /// selected count
 @property (nonatomic, assign) NSInteger count;
