@@ -6,12 +6,12 @@
 //  Copyright © 2020 Shihuaixing. All rights reserved.
 //
 
+#import <CATCommonKit/CATCommonKit.h>
 #import "CATAlbumCell.h"
 #import "CATLibrary.h"
 #import "CATAlbum.h"
 
 @interface CATAlbumCell ()<CATPhotoDownLoadDelegate>
-/***/
 @property (nonatomic, strong) UIImageView *thumbView;
 @property (nonatomic, strong) UILabel *albumNameLabel;
 
@@ -22,7 +22,8 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         
-        _thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
+        _thumbView = [[UIImageView alloc] init];
+        _thumbView.size = CGSizeMake(80, 80);
         _thumbView.backgroundColor = [UIColor clearColor];
         _thumbView.contentMode = UIViewContentModeScaleAspectFill;
         _thumbView.clipsToBounds = YES;
@@ -36,13 +37,8 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    
-
-    CGRect thumbFrame = _thumbView.frame;
-    thumbFrame.origin.y = (CGRectGetHeight(self.frame) - CGRectGetHeight(_thumbView.frame)) / 2.0;
-    _thumbView.frame = thumbFrame;
-    
-    _albumNameLabel.frame = CGRectMake(CGRectGetMaxX(_thumbView.frame) + 16, 0, 200, CGRectGetHeight(self.frame));
+    _thumbView.centerY = self.height / 2.0;
+    _albumNameLabel.frame = CGRectMake(_thumbView.right + 16, 0, 200, self.height);
 }
 
 - (void)setAlbum:(CATAlbum *)album {
@@ -53,7 +49,7 @@
         _thumbView.image = album.thumbImage;
     } else {
         
-        [[CATPhotoManager shareManager] requestAlbumThumbWithAlbum:album targetSize:_thumbView.frame.size delegate:self];
+        [[CATPhotoManager shareManager] requestAlbumThumbWithAlbum:album targetSize:_thumbView.size delegate:self];
     }
     _albumNameLabel.text = [NSString stringWithFormat:@"%@----%lu", album.albumName, (unsigned long)album.assetCount];
 }

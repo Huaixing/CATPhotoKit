@@ -7,6 +7,7 @@
 //
 
 #import "CATNoAuthorizedView.h"
+#import <CATCommonKit/CATCommonKit.h>
 
 @interface CATNoAuthorizedView ()
 
@@ -58,7 +59,7 @@
         if (icon) {
             _iconView.hidden = NO;
             _iconView.frame = CGRectMake(0, 0, icon.size.width, icon.size.height);
-            _iconView.center = CGPointMake(CGRectGetWidth(self.frame) / 2.0, CGRectGetHeight(self.frame) / 2.0);
+            _iconView.center = CGPointMake(self.width / 2.0, self.height / 2.0);
             contentHeight += CGRectGetHeight(_iconView.frame);
         }
     }
@@ -81,27 +82,19 @@
         _messageLabel.attributedText = attributedString;
         [_messageLabel sizeToFit];
         CGSize size = [_messageLabel sizeThatFits:CGSizeMake(CGRectGetWidth(self.frame), MAXFLOAT)];
-        _messageLabel.frame = CGRectMake(0, 0, CGRectGetWidth(self.frame), size.height);
-        _messageLabel.center = CGPointMake(CGRectGetWidth(self.frame) / 2.0, CGRectGetHeight(self.frame) / 2.0);
+        _messageLabel.frame = CGRectMake(0, 0, self.width, size.height);
+        _messageLabel.center = CGPointMake(self.width / 2.0, self.height / 2.0);
         contentHeight += CGRectGetHeight(_messageLabel.frame);
     }
     
     if (contentHeight) {
-        CGFloat topY = (CGRectGetHeight(self.frame) - contentHeight) / 2.0;
+        CGFloat topY = (self.height - contentHeight) / 2.0;
         if (_iconView.isHidden) {
-            CGRect labelFrame = _messageLabel.frame;
-            labelFrame.origin.y = topY;
-            _messageLabel.frame = labelFrame;
+            _messageLabel.y = topY;
         } else {
-
-            CGRect iconFrame = _iconView.frame;
-            iconFrame.origin.y = topY;
-            _iconView.frame = iconFrame;
+            _iconView.y = topY;
             if (!_messageLabel.isHidden) {
-                CGRect labelFrame = _messageLabel.frame;
-                labelFrame.origin.y = CGRectGetMaxY(_iconView.frame) + 20;
-                _messageLabel.frame = labelFrame;
-                
+                _messageLabel.y = _iconView.bottom + 20;
             }
         }
     }

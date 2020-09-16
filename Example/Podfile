@@ -1,9 +1,10 @@
-use_frameworks!
+source 'https://github.com/Huaixing/CATMasterRepos.git'
 
 platform :ios, '10.0'
 
 target 'CATPhotoKit_Example' do
   pod 'CATPhotoKit', :path => '../'
+  pod 'CATCommonKit'
 
   target 'CATPhotoKit_Tests' do
     inherit! :search_paths

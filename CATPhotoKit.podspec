@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "CATPhotoKit"
-  s.version          = "0.1.3"
+  s.version          = "0.1.4"
   s.summary          = "kit of access local library in project."
   s.description      = <<-DESC
 kit of access local library in cat project, upload appstore
@@ -16,10 +16,7 @@ kit of access local library in cat project, upload appstore
   s.source_files = "CATPhotoKit/Classes/**/*.{h,m}"
   
   s.resource_bundles = {
-    'CATPhotoKit' => ['CATPhotoKit/Assets/*.png']
+    'CATPhotoKit' => ['CATPhotoKit/Assets/*.png','CATPhotoKit/Assets/**/*.strings']
   }
-
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'CATCommonKit'
 end

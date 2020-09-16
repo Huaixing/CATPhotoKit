@@ -1,16 +1,24 @@
 PODS:
-  - CATPhotoKit (0.1.3)
+  - CATCommonKit (0.1.5)
+  - CATPhotoKit (0.1.4):
+    - CATCommonKit
 
 DEPENDENCIES:
+  - CATCommonKit
   - CATPhotoKit (from `../`)
+
+SPEC REPOS:
+  https://github.com/Huaixing/CATMasterRepos.git:
+    - CATCommonKit
 
 EXTERNAL SOURCES:
   CATPhotoKit:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CATPhotoKit: 7586ced660edfeae4dcb2b39ca9e6cda37798f58
+  CATCommonKit: bf996cc1c00054a3de19693cf8bca26c6d23ff3d
+  CATPhotoKit: 7d0cf6cab5bc527a8051e329cc964c28ce5341a4
 
-PODFILE CHECKSUM: 25fa69bc53b213e98296502cc0a7bf018b4440b2
+PODFILE CHECKSUM: 44e1e5bb988501f85092aaaaa07410728b258bd7
 
 COCOAPODS: 1.9.3

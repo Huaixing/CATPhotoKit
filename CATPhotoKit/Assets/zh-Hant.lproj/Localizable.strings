@@ -1,0 +1,10 @@
+/* 
+  Localizable.strings
+  Pods
+
+  Created by Shihuaixing on 2020/9/16.
+  
+*/
+"photo_kit_picker_done"="完成";
+"photo_kit_preview_photo"="预览";
+"photo_kit_picker_some_photo_done"="完成 (%ld)";

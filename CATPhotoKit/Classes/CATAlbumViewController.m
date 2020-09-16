@@ -8,6 +8,7 @@
 
 #import "CATAlbumViewController.h"
 #import "CATPhotoViewController.h"
+#import <CATCommonKit/CATCommonKit.h>
 
 #import "CATLibrary.h"
 #import "CATAlbumCell.h"
@@ -110,7 +111,7 @@
             _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         }
         
-        _loadingView.center = CGPointMake(CGRectGetWidth(self.view.frame) / 2.0, CGRectGetHeight(self.view.frame) / 2.0);
+        _loadingView.center = CGPointMake(self.view.width / 2.0, self.view.height / 2.0);
         _loadingView.hidesWhenStopped = YES;
     }
     return _loadingView;

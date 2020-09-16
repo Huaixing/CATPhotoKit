@@ -13,8 +13,8 @@
     if (!name.length) {
         return nil;
     }
-    NSString *bundlePath = [[NSBundle bundleForClass:NSClassFromString(@"CATPhotoKit")].resourcePath stringByAppendingPathComponent:@"/CATPhotoKit.bundle"];
-    NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+    NSURL *bundleUrl = [[NSBundle mainBundle] URLForResource:@"CATPhotoKit" withExtension:@"bundle"];
+    NSBundle *bundle = [NSBundle bundleWithURL:bundleUrl];
     UIImage *image = [UIImage imageNamed:name inBundle:bundle compatibleWithTraitCollection:nil];
     return image;
 }

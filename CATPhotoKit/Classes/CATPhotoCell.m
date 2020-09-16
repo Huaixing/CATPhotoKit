@@ -5,7 +5,7 @@
 //  Created by Shihuaixing on 2020/8/5.
 //  Copyright © 2020 Shihuaixing. All rights reserved.
 //
-
+#import <CATCommonKit/CATCommonKit.h>
 #import "CATPhotoCell.h"
 #import "CATLibrary.h"
 #import "CATPhoto.h"
@@ -34,7 +34,7 @@
         _photoView.clipsToBounds = YES;
         [self.contentView addSubview:_photoView];
         
-        _checkButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) / 2.0, CGRectGetHeight(self.frame) / 2.0, CGRectGetWidth(self.frame) / 2.0, CGRectGetHeight(self.frame) / 2.0)];
+        _checkButton = [[UIButton alloc] initWithFrame:CGRectMake(self.width / 2.0, self.height / 2.0, self.width / 2.0, self.height / 2.0)];
         _checkButton.backgroundColor = [UIColor clearColor];
         [_checkButton addTarget:self action:@selector(checkButtonDidClick) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:_checkButton];

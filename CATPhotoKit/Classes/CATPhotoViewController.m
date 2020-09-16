@@ -9,6 +9,7 @@
 #import "CATPhotoViewController.h"
 
 #import "CATPhotoPickerController.h"
+#import <CATCommonKit/CATCommonKit.h>
 
 #import "CATLibrary.h"
 #import "CATAlbum.h"
@@ -55,15 +56,15 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     _selectedBar = [[CATPhotoSelectedBar alloc] init];
     _selectedBar.delegate = self;
     [self.view addSubview:_selectedBar];
-    CGFloat barHeight = 54 + _selectedBar.bottomMargin;
-    _selectedBar.frame = CGRectMake(0, CGRectGetHeight(self.view.frame) - barHeight, CGRectGetWidth(self.view.frame), barHeight);
+    CGFloat barHeight = 54 + [UIView bottomInset];
+    _selectedBar.frame = CGRectMake(0, self.view.height - barHeight, self.view.width, barHeight);
     
     
     _columns = ((CATPhotoPickerController *)self.navigationController).columns;
     _space = ((CATPhotoPickerController *)self.navigationController).space;
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame) - barHeight) collectionViewLayout:flowLayout];
+    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - barHeight) collectionViewLayout:flowLayout];
     _collectionView.backgroundColor = [UIColor whiteColor];
     _collectionView.delegate = self;
     _collectionView.dataSource = self;
