@@ -18,5 +18,5 @@ kit of access local library in cat project, upload appstore
   s.resource_bundles = {
     'CATPhotoKit' => ['CATPhotoKit/Assets/*.png','CATPhotoKit/Assets/**/*.strings']
   }
-  s.dependency 'CATCommonKit'
+  s.dependency 'CATCommonKit', '~>0.1.5'
 end
