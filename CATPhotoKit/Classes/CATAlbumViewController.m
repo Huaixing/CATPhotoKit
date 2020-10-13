@@ -97,7 +97,10 @@
         _albumTableView.estimatedSectionHeaderHeight = 0;
         _albumTableView.estimatedSectionFooterHeight = 0;
         if (@available(iOS 11.0, *)) {
-//            _albumTableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+            _albumTableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAutomatic;
+        } else {
+            CGFloat insetTop = [UIView navigationBottomWithNavigationController:self.navigationController];
+            _albumTableView.contentInset = UIEdgeInsetsMake(insetTop, 0, 0, 0);
         }
     }
     return _albumTableView;

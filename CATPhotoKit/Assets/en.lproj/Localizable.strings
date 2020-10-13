@@ -8,3 +8,4 @@
 "photo_kit_picker_done"="完成";
 "photo_kit_preview_photo"="预览";
 "photo_kit_picker_some_photo_done"="完成 (%ld)";
+"photo_kit_picker_photo_limit_count"="你最多只能选择%ld张照片";

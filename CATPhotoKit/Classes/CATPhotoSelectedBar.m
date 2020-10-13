@@ -63,12 +63,12 @@
     
     _contentView.frame = CGRectMake(0, 0, self.width, self.height - [UIView bottomInset]);
     
-    CGFloat preWidth = [_previewButton.titleLabel.text cat_sizeWithFont:_previewButton.titleLabel.font];
+    CGFloat preWidth = [_previewButton.titleLabel.text cat_widthWithFont:_previewButton.titleLabel.font];
     // 预览两个字距离左屏幕距离
     CGFloat preMargin = 16.0;
     _previewButton.frame = CGRectMake(0, 0, preWidth + 2 * preMargin, CGRectGetHeight(_contentView.frame));
     
-    CGFloat countWidth = [_textLabel.text cat_sizeWithFont:_textLabel.font];
+    CGFloat countWidth = [_textLabel.text cat_widthWithFont:_textLabel.font];
     _textLabel.frame = CGRectMake(0, 0, countWidth, _textLabel.font.lineHeight);
     
     // 完成按钮上文案距离按钮左右距离

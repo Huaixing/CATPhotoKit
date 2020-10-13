@@ -14,8 +14,8 @@
 @optional
 
 /// 点击done
-/// @param seletedBar self
-- (void)photoSelectedBarDidClickDone:(CATPhotoSelectedBar *)seletedBar;
+/// @param selectedBar self
+- (void)photoSelectedBarDidClickDone:(CATPhotoSelectedBar *)selectedBar;
 @end
 
 @interface CATPhotoSelectedBar : UIView

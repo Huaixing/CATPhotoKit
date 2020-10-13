@@ -7,7 +7,6 @@
 //
 
 #import "CATPhotoPickerController.h"
-#import "CATPhotoViewController.h"
 
 @interface CATPhotoPickerController ()
 
@@ -38,10 +37,28 @@
     // Do any additional setup after loading the view.
 }
 
-#pragma mark - Public
+#pragma mark - Private
 - (void)photoViewControllerDidFinishPickPhotos:(NSArray<CATPhoto *> *)photos {
     if (self.picker && [self.picker respondsToSelector:@selector(photoPickerController:didFinishPickPhotos:)]) {
         [self.picker photoPickerController:self didFinishPickPhotos:photos];
+    }
+}
+
+#pragma mark - Public
+- (void)setLimitPhotoCount:(NSUInteger)limitPhotoCount {
+    if (_pickMode == CATPickModeMultiplePick) {
+        if (limitPhotoCount == 1) {
+            _pickMode = CATPickModeSinglePick;
+        }
+    }
+    _limitPhotoCount = limitPhotoCount;
+}
+
+- (void)setPickMode:(CATPickMode)pickMode {
+    if (_limitPhotoCount == 1) {
+        _pickMode = CATPickModeSinglePick;
+    } else {
+        _pickMode = pickMode;
     }
 }
 

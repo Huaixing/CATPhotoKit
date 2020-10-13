@@ -47,6 +47,8 @@
     CATAlbumViewController *album = [[CATAlbumViewController alloc] init];
     
     CATPhotoPickerController *pick = [[CATPhotoPickerController alloc] initWithRootViewController:album];
+//    pick.pickMode = CATPickModeSinglePick;
+    pick.limitPhotoCount = 2;
     pick.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:pick animated:YES completion:nil];
 }

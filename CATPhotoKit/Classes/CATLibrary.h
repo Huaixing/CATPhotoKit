@@ -9,18 +9,18 @@
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
 
-// 文件类型
-typedef NS_ENUM(NSInteger, CATPhotoMediaType) {
-    CATPhotoMediaTypeAll = 0,// 照片和视频
-    CATPhotoMediaTypePhoto = 1,// 照片
-    CATPhotoMediaTypeVideo = 2,// 视频
+// 获取的文件类型
+typedef NS_ENUM(NSInteger, CATPhotoFetchMediaType) {
+    CATPhotoFetchMediaTypeAll = 0,// 照片和视频
+    CATPhotoFetchMediaTypeImage = 1,// 照片
+    CATPhotoFetchMediaTypeVideo = 2,// 视频
 };
 
-// 文件排序类型<对asset.createData排序>
-typedef NS_ENUM(NSInteger, CATPhotoSortType) {
-    CATPhotoSortTypeNone = 0,// 按相册顺序
-    CATPhotoSortTypeAscending = 1,// 按createData升序
-    CATPhotoSortTypeDescending = 2,// 按createData降序
+// 获取的文件排序类型<对asset.createData排序>
+typedef NS_ENUM(NSInteger, CATPhotoFetchSortType) {
+    CATPhotoFetchSortTypeNone = 0,// 按相册顺序
+    CATPhotoFetchSortTypeAscending = 1,// 按createData升序
+    CATPhotoFetchSortTypeDescending = 2,// 按createData降序
 };
 
 @class CATAlbum, CATPhoto, CATPhotoManager;
@@ -41,8 +41,8 @@ typedef NS_ENUM(NSInteger, CATPhotoSortType) {
 
 @interface CATPhotoFetchConfig : NSObject
 /**media type*/
-@property (nonatomic, assign) CATPhotoMediaType mediaType;
-@property (nonatomic, assign) CATPhotoSortType sortType;
+@property (nonatomic, assign) CATPhotoFetchMediaType mediaType;
+@property (nonatomic, assign) CATPhotoFetchSortType sortType;
 
 @end
 

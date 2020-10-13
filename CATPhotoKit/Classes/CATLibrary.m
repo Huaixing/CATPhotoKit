@@ -43,8 +43,8 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
 
 - (instancetype)init {
     if (self = [super init]) {
-        _mediaType = CATPhotoMediaTypeAll;
-        _sortType = CATPhotoSortTypeNone;
+        _mediaType = CATPhotoFetchMediaTypeAll;
+        _sortType = CATPhotoFetchSortTypeNone;
     }
     return self;
 }
@@ -173,14 +173,14 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
         NSMutableArray *localPhotos = [NSMutableArray array];
         
         PHFetchOptions *options = [[PHFetchOptions alloc] init];
-        if (config.sortType == CATPhotoSortTypeAscending) {
+        if (config.sortType == CATPhotoFetchSortTypeAscending) {
             options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
-        } else if (config.sortType == CATPhotoSortTypeDescending) {
+        } else if (config.sortType == CATPhotoFetchSortTypeDescending) {
             options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
         }
-        if (config.mediaType == CATPhotoMediaTypePhoto) {
+        if (config.mediaType == CATPhotoFetchMediaTypeImage) {
             options.predicate = [NSPredicate predicateWithFormat:@"(mediaType = %d)", PHAssetMediaTypeImage];
-        } else if (config.mediaType == CATPhotoMediaTypeVideo) {
+        } else if (config.mediaType == CATPhotoFetchMediaTypeVideo) {
             options.predicate = [NSPredicate predicateWithFormat:@"(mediaType = %d)", PHAssetMediaTypeVideo];
         }
         
@@ -193,6 +193,11 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
                     if (asset) {
                         CATPhoto *photo = [[CATPhoto alloc] init];
                         photo.asset = asset;
+                        if (asset.mediaType == PHAssetMediaTypeImage) {
+                            photo.mediaType = CATPhotoMediaTypeImage;
+                        } else if (asset.mediaType == PHAssetMediaTypeVideo) {
+                            photo.mediaType = CATPhotoMediaTypeVideo;
+                        }
                         photo.localIdentifier = asset.localIdentifier;
                         [localPhotos addObject:photo];
                     }

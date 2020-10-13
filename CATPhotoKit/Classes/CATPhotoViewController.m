@@ -10,12 +10,14 @@
 
 #import "CATPhotoPickerController.h"
 #import <CATCommonKit/CATCommonKit.h>
+#import <MBProgressHUD/MBProgressHUD.h>
 
 #import "CATLibrary.h"
 #import "CATAlbum.h"
 #import "CATPhotoCell.h"
 #import "CATPhoto.h"
 #import "CATPhotoSelectedBar.h"
+#import "NSString+Bundle.h"
 
 
 @interface CATPhotoViewController ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate, CATPhotoCellDelegate, CATPhotoSelectedBarDelegate>
@@ -58,18 +60,22 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     [self.view addSubview:_selectedBar];
     CGFloat barHeight = 54 + [UIView bottomInset];
     _selectedBar.frame = CGRectMake(0, self.view.height - barHeight, self.view.width, barHeight);
+    _selectedBar.hidden = ![self canMultiplePick];
     
     
     _columns = ((CATPhotoPickerController *)self.navigationController).columns;
     _space = ((CATPhotoPickerController *)self.navigationController).space;
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - barHeight) collectionViewLayout:flowLayout];
+    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - (_selectedBar.isHidden ? 0 : _selectedBar.height)) collectionViewLayout:flowLayout];
     _collectionView.backgroundColor = [UIColor whiteColor];
     _collectionView.delegate = self;
     _collectionView.dataSource = self;
     if (@available(iOS 11.0, *)) {
-//        _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAutomatic;
+    } else {
+        CGFloat insetTop = [UIView navigationBottomWithNavigationController:self.navigationController];
+        _collectionView.contentInset = UIEdgeInsetsMake(insetTop, 0, 0, 0);
     }
     [self.view addSubview:_collectionView];
     
@@ -92,6 +98,23 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
 
 - (void)dealloc {
     NSLog(@" CATPhotoViewController ----- dealloc");
+}
+
+#pragma mark - Private
+
+/// 是否支持多选（多选只针对照片）
+- (BOOL)canMultiplePick {
+    if (![self.navigationController isKindOfClass:[CATPhotoPickerController class]]) {
+        return YES;
+    }
+    return ((CATPhotoPickerController *)self.navigationController).pickMode == CATPickModeMultiplePick;
+}
+/// 照片勾选数量上限，default 9
+- (NSUInteger)limitPhotoCount {
+    if (![self.navigationController isKindOfClass:[CATPhotoPickerController class]]) {
+        return 9;
+    }
+    return ((CATPhotoPickerController *)self.navigationController).limitPhotoCount;
 }
 
 #pragma mark - Getter
@@ -118,9 +141,27 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     
     CATPhotoCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:CATPhotoIdentifier forIndexPath:indexPath];
     CATPhoto *photo = [self.photos objectAtIndex:indexPath.item];
-    cell.photo = photo;
     cell.delegate = self;
+    cell.canMultiplePick = [self canMultiplePick];
+    cell.photo = photo;
     return cell;
+}
+
+#pragma mark - UICollectionViewDelegate
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    if (![self canMultiplePick]) {
+        // 直接选中该Asset
+        [self.seletedPhotos removeAllObjects];
+        if (indexPath.item < self.photos.count) {
+            CATPhoto *photo = [self.photos objectAtIndex:indexPath.item];
+            [self.seletedPhotos addObject:photo];
+        }
+        if (self.seletedPhotos.count) {
+            [self photoSelectedBarDidClickDone:nil];
+        }
+        return;
+    }
+    // 浏览大图
 }
 
 #pragma mark - UICollectionViewDelegateFlowLayout
@@ -139,6 +180,27 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
 }
 
 #pragma mark - CATPhotoCellDelegate
+- (BOOL)photoCell:(CATPhotoCell *)photoCell shouldSelectedPhoto:(CATPhoto *)photo {
+    if (![self canMultiplePick]) {
+        return NO;
+    }
+    if (!photo.isSelected) {
+        // 将要勾选
+        if (self.seletedPhotos.count >= [self limitPhotoCount]) {
+            // 勾选已达上限，toast
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+            hud.mode = MBProgressHUDModeText;
+            hud.label.font = [UIFont boldSystemFontOfSize:17.0];
+            hud.label.textColor = [UIColor blackColor];
+            hud.label.text = [NSString stringWithFormat:[NSString lcoalizationString:@"photo_kit_picker_photo_limit_count"], self.seletedPhotos.count];
+            hud.userInteractionEnabled = NO;
+            [hud hideAnimated:YES afterDelay:2.0];
+            return NO;
+        }
+    }
+    return YES;
+}
+
 - (void)photoCell:(CATPhotoCell *)photoCell didSelectedPhoto:(CATPhoto *)photo {
     
     if (photo.isSelected) {
@@ -150,7 +212,7 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
 }
 
 #pragma mark - CATPhotoSelectedBarDelegate
-- (void)photoSelectedBarDidClickDone:(CATPhotoSelectedBar *)seletedBar {
+- (void)photoSelectedBarDidClickDone:(CATPhotoSelectedBar *)selectedBar {
     // 回传给导航栏，让导航栏跟外界交涉。最后的结果都将以导航栏的形式传给外界
     if (self.navigationController) {
         SEL selector = NSSelectorFromString(@"photoViewControllerDidFinishPickPhotos:");

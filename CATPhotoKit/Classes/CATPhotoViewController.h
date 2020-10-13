@@ -14,6 +14,8 @@
 
 /**album*/
 @property (nonatomic, strong) CATAlbum *album;
+/// 是否支持多选（多选只针对照片）
+@property (nonatomic, assign) BOOL canMultiplePick;
 
 @end
 

@@ -1,13 +1,19 @@
 PODS:
-  - CATCommonKit (0.1.6)
-  - CATPhotoKit (0.1.4):
-    - CATCommonKit (~> 0.1.5)
+  - CATCommonKit (0.2.1):
+    - MBProgressHUD (~> 1.2.0)
+  - CATPhotoKit (0.1.5):
+    - CATCommonKit (~> 0.2.0)
+    - MBProgressHUD (~> 1.2.0)
+  - MBProgressHUD (1.2.0)
 
 DEPENDENCIES:
-  - CATCommonKit (~> 0.1.5)
+  - CATCommonKit (~> 0.2.0)
   - CATPhotoKit (from `../`)
+  - MBProgressHUD (~> 1.2.0)
 
 SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - MBProgressHUD
   https://github.com/Huaixing/CATMasterRepos.git:
     - CATCommonKit
 
@@ -16,9 +22,10 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CATCommonKit: 1698824bd4fec2a2fc362af404d002dd081775ef
-  CATPhotoKit: c4afdea9882d97e589a415de86c9b61a81e321da
+  CATCommonKit: 1ac87ad26777decef34fc0ea2e3e2b743536fcf8
+  CATPhotoKit: c3c9738399963ab821f9973404de4dc0cd26713f
+  MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
 
-PODFILE CHECKSUM: 0c771976df5d6fdb52a849ddac2ea06d72516f2d
+PODFILE CHECKSUM: 7f105b13e16d415b67e778a52423fcd88efae169
 
 COCOAPODS: 1.9.3

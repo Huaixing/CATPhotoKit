@@ -13,7 +13,16 @@
 @protocol CATPhotoCellDelegate <NSObject>
 
 @optional
+
+/// 勾选或取消勾选Asset
+/// @param photoCell self
+/// @param photo photo
 - (void)photoCell:(CATPhotoCell *)photoCell didSelectedPhoto:(CATPhoto *)photo;
+
+/// 能否继续选中Asset
+/// @param photoCell self
+/// @param photo photo
+- (BOOL)photoCell:(CATPhotoCell *)photoCell shouldSelectedPhoto:(CATPhoto *)photo;
 
 @end
 
@@ -22,6 +31,8 @@
 @property (nonatomic, weak) id<CATPhotoCellDelegate> delegate;
 /**photo*/
 @property (nonatomic, strong) CATPhoto *photo;
+/// 是否支持多选（多选只针对照片）
+@property (nonatomic, assign) BOOL canMultiplePick;
 
 @end
 
