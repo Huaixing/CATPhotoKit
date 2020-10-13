@@ -71,12 +71,6 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     _collectionView.backgroundColor = [UIColor whiteColor];
     _collectionView.delegate = self;
     _collectionView.dataSource = self;
-    if (@available(iOS 11.0, *)) {
-        _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentAutomatic;
-    } else {
-        CGFloat insetTop = [UIView navigationBottomWithNavigationController:self.navigationController];
-        _collectionView.contentInset = UIEdgeInsetsMake(insetTop, 0, 0, 0);
-    }
     [self.view addSubview:_collectionView];
     
     [_collectionView registerClass:[CATPhotoCell class] forCellWithReuseIdentifier:CATPhotoIdentifier];
