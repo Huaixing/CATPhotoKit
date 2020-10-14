@@ -19,6 +19,8 @@
     if (self) {
         _columns = 4;
         _space = 1.0;
+        _limitPhotoCount = 9;
+        _pickMode = CATPickModeMultiplePick;
     }
     return self;
 }
@@ -28,6 +30,8 @@
     if (self) {
         _columns = 4;
         _space = 1.0;
+        _limitPhotoCount = 9;
+        _pickMode = CATPickModeMultiplePick;
     }
     return self;
 }

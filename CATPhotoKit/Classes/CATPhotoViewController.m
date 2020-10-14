@@ -182,13 +182,8 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
         // 将要勾选
         if (self.seletedPhotos.count >= [self limitPhotoCount]) {
             // 勾选已达上限，toast
-            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-            hud.mode = MBProgressHUDModeText;
-            hud.label.font = [UIFont boldSystemFontOfSize:17.0];
-            hud.label.textColor = [UIColor blackColor];
-            hud.label.text = [NSString stringWithFormat:[NSString lcoalizationString:@"photo_kit_picker_photo_limit_count"], self.seletedPhotos.count];
-            hud.userInteractionEnabled = NO;
-            [hud hideAnimated:YES afterDelay:2.0];
+            NSString *message = [NSString stringWithFormat:[NSString lcoalizationString:@"photo_kit_picker_photo_limit_count"], self.seletedPhotos.count];
+            [CATHUDUtils showToastWithMessage:message inView:self.view];
             return NO;
         }
     }

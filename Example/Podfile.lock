@@ -1,9 +1,8 @@
 PODS:
-  - CATCommonKit (0.2.2):
+  - CATCommonKit (0.2.3):
     - MBProgressHUD (~> 1.2.0)
-  - CATPhotoKit (0.1.6):
+  - CATPhotoKit (0.1.7):
     - CATCommonKit (~> 0.2.0)
-    - MBProgressHUD (~> 1.2.0)
   - MBProgressHUD (1.2.0)
 
 DEPENDENCIES:
@@ -22,8 +21,8 @@ EXTERNAL SOURCES:
     :path: "../"
 
 SPEC CHECKSUMS:
-  CATCommonKit: d803ae59d5d6bb74b8aff572a51f2b1bdfec187f
-  CATPhotoKit: a96a6ef595d714a48b7c168c09a5be4f557d1ea5
+  CATCommonKit: d96d98dfccdc8cfb47da8827c6c035e314da961b
+  CATPhotoKit: 21f82161a6d1be696d277b48f26951b3911f32cd
   MBProgressHUD: 3ee5efcc380f6a79a7cc9b363dd669c5e1ae7406
 
 PODFILE CHECKSUM: 7f105b13e16d415b67e778a52423fcd88efae169
