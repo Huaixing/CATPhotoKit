@@ -84,7 +84,7 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
         [sself.collectionView reloadData];
         // 滚动最近照片的位置
         if (photos.count) {
-            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:(photos.count - 1) inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
+            [sself.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:(photos.count - 1) inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
         }
     }];
 }
@@ -99,14 +99,14 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
 /// 是否支持多选（多选只针对照片）
 - (BOOL)canMultiplePick {
     if (![self.navigationController isKindOfClass:[CATPhotoPickerController class]]) {
-        return YES;
+        return NO;
     }
     return ((CATPhotoPickerController *)self.navigationController).pickMode == CATPickModeMultiplePick;
 }
 /// 照片勾选数量上限，default 9
 - (NSUInteger)limitPhotoCount {
     if (![self.navigationController isKindOfClass:[CATPhotoPickerController class]]) {
-        return 9;
+        return 0;
     }
     return ((CATPhotoPickerController *)self.navigationController).limitPhotoCount;
 }
@@ -183,11 +183,23 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
         if (self.seletedPhotos.count >= [self limitPhotoCount]) {
             // 勾选已达上限，toast
             NSString *message = [NSString stringWithFormat:[NSString lcoalizationString:@"photo_kit_picker_photo_limit_count"], self.seletedPhotos.count];
-            [CATHUDUtils showToastWithMessage:message inView:self.view];
+            [self showToastWithMessage:message inView:self.view];
             return NO;
         }
     }
     return YES;
+}
+
+- (void)showToastWithMessage:(NSString *)message inView:(UIView *)inView {
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:inView animated:YES];
+    hud.mode = MBProgressHUDModeText;
+    hud.square = NO;
+    hud.detailsLabel.font = [UIFont boldSystemFontOfSize:17.0];
+    hud.detailsLabel.textColor = [UIColor blackColor];
+    hud.detailsLabel.text = message;
+    hud.removeFromSuperViewOnHide = YES;
+    hud.userInteractionEnabled = NO;
+    [hud hideAnimated:YES afterDelay:2.0];
 }
 
 - (void)photoCell:(CATPhotoCell *)photoCell didSelectedPhoto:(CATPhoto *)photo {
@@ -202,7 +214,7 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
 
 #pragma mark - CATPhotoSelectedBarDelegate
 - (void)photoSelectedBarDidClickDone:(CATPhotoSelectedBar *)selectedBar {
-    // 回传给导航栏，让导航栏跟外界交涉。最后的结果都将以导航栏的形式传给外界
+    /// 回传给导航栏，让导航栏跟外界交涉。最后的结果都将以导航栏的形式传给外界
     if (self.navigationController) {
         SEL selector = NSSelectorFromString(@"photoViewControllerDidFinishPickPhotos:");
         if ([self.navigationController respondsToSelector:selector]) {

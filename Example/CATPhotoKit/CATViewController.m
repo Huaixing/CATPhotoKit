@@ -49,6 +49,7 @@
     CATPhotoPickerController *pick = [[CATPhotoPickerController alloc] initWithRootViewController:album];
 //    pick.pickMode = CATPickModeSinglePick;
     pick.limitPhotoCount = 2;
+    pick.autoIntoLibrary = NO;
     pick.modalPresentationStyle = UIModalPresentationFullScreen;
     [self presentViewController:pick animated:YES completion:nil];
 }

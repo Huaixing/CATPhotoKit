@@ -17,10 +17,7 @@
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        _columns = 4;
-        _space = 1.0;
-        _limitPhotoCount = 9;
-        _pickMode = CATPickModeMultiplePick;
+        [self setupInitial];
     }
     return self;
 }
@@ -28,10 +25,7 @@
 - (instancetype)initWithRootViewController:(UIViewController *)rootViewController {
     self = [super initWithRootViewController:rootViewController];
     if (self) {
-        _columns = 4;
-        _space = 1.0;
-        _limitPhotoCount = 9;
-        _pickMode = CATPickModeMultiplePick;
+        [self setupInitial];
     }
     return self;
 }
@@ -42,6 +36,15 @@
 }
 
 #pragma mark - Private
+
+- (void)setupInitial {
+    _columns = 4;
+    _space = 1.0;
+    _limitPhotoCount = 9;
+    _pickMode = CATPickModeMultiplePick;
+    _autoIntoLibrary = YES;
+}
+
 - (void)photoViewControllerDidFinishPickPhotos:(NSArray<CATPhoto *> *)photos {
     if (self.picker && [self.picker respondsToSelector:@selector(photoPickerController:didFinishPickPhotos:)]) {
         [self.picker photoPickerController:self didFinishPickPhotos:photos];
@@ -50,10 +53,8 @@
 
 #pragma mark - Public
 - (void)setLimitPhotoCount:(NSUInteger)limitPhotoCount {
-    if (_pickMode == CATPickModeMultiplePick) {
-        if (limitPhotoCount == 1) {
-            _pickMode = CATPickModeSinglePick;
-        }
+    if (limitPhotoCount == 1) {
+        _pickMode = CATPickModeSinglePick;
     }
     _limitPhotoCount = limitPhotoCount;
 }

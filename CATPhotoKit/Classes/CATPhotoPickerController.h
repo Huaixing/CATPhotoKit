@@ -44,6 +44,9 @@ typedef NS_ENUM(NSInteger, CATPickMode) {
 /// 当pickmode为多选，该设置为1时，则pickmode会自动置为单选
 @property (nonatomic, assign) NSUInteger limitPhotoCount;
 
+/// 自动进入所有照片相册，default YES
+@property (nonatomic, assign) BOOL autoIntoLibrary;
+
 
 
 @end

@@ -8,6 +8,7 @@
 
 #import "CATAlbumViewController.h"
 #import "CATPhotoViewController.h"
+#import "CATPhotoPickerController.h"
 #import <CATCommonKit/CATCommonKit.h>
 
 #import "CATLibrary.h"
@@ -51,8 +52,11 @@
         if (!sself) return;
         if (status == PHAuthorizationStatusAuthorized) {
             [[CATPhotoManager shareManager] fetchAlbumsWithAfterSmartAlbumUserLibraryHandler:^(NSArray<CATAlbum *> *albums) {
-                // 自动进入照片列表页面
-                [sself pushPhotoControllerAlbum:[albums firstObject] animated:NO];
+                
+                if ([self shouldAutoIntoLibrary]) {
+                    // 自动进入照片列表页面
+                    [sself pushPhotoControllerAlbum:[albums firstObject] animated:NO];
+                }
                 
             } complete:^(NSArray<CATAlbum *> *albums) {
                 
@@ -120,6 +124,12 @@
 }
 
 #pragma mark - Private
+
+/// 是否自动进入全部照片相册
+- (BOOL)shouldAutoIntoLibrary {
+    return (((CATPhotoPickerController *)self.navigationController).autoIntoLibrary);
+}
+
 - (void)pushPhotoControllerAlbum:(CATAlbum *)album animated:(BOOL)animated {
     if (!album) {
         return;
