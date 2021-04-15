@@ -16,16 +16,16 @@
 #import "CATAlbum.h"
 #import "CATPhotoCell.h"
 #import "CATPhoto.h"
-#import "CATPhotoSelectedBar.h"
+#import "CATPhotoGridBar.h"
 #import "NSString+Bundle.h"
 
 
-@interface CATPhotoViewController ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate, CATPhotoCellDelegate, CATPhotoSelectedBarDelegate>
+@interface CATPhotoViewController ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate, CATPhotoCellDelegate, CATPhotoGridBarDelegate>
 /***/
 @property (nonatomic, strong) NSMutableArray<CATPhoto *> *photos;
 @property (nonatomic, strong) UICollectionView *collectionView;
 /// 底部选择栏
-@property (nonatomic, strong) CATPhotoSelectedBar *selectedBar;
+@property (nonatomic, strong) CATPhotoGridBar *selectedBar;
 
 
 /**照片列表中一行多少个，default 4*/
@@ -55,7 +55,7 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     // Do any additional setup after loading the view.
     self.view.backgroundColor = [UIColor whiteColor];
     
-    _selectedBar = [[CATPhotoSelectedBar alloc] init];
+    _selectedBar = [[CATPhotoGridBar alloc] init];
     _selectedBar.delegate = self;
     [self.view addSubview:_selectedBar];
     CGFloat barHeight = 54 + [UIView bottomInset];
@@ -212,8 +212,8 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     _selectedBar.count = self.seletedPhotos.count;
 }
 
-#pragma mark - CATPhotoSelectedBarDelegate
-- (void)photoSelectedBarDidClickDone:(CATPhotoSelectedBar *)selectedBar {
+#pragma mark - CATPhotoGridBarDelegate
+- (void)photoSelectedBarDidClickDone:(CATPhotoGridBar *)selectedBar {
     /// 回传给导航栏，让导航栏跟外界交涉。最后的结果都将以导航栏的形式传给外界
     if (self.navigationController) {
         SEL selector = NSSelectorFromString(@"photoViewControllerDidFinishPickPhotos:");

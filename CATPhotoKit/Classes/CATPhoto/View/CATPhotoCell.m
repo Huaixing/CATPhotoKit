@@ -11,7 +11,7 @@
 #import "CATPhoto.h"
 #import "UIImage+Bundle.h"
 
-@interface CATPhotoCell ()<CATPhotoDownLoadDelegate>
+@interface CATPhotoCell ()
 /**imageview*/
 @property (nonatomic, strong) UIImageView *photoView;
 
@@ -42,11 +42,11 @@
         CGFloat checkButtonWidth = self.width * 2 / 5.0;
         CGFloat checkButtonHeight = self.height * 2 / 5.0;
         _checkButton = [[UIButton alloc] initWithFrame:CGRectMake(self.width - checkButtonWidth, 0, checkButtonWidth, checkButtonHeight)];
-        _checkButton.backgroundColor = [UIColor redColor];
+        _checkButton.backgroundColor = [UIColor clearColor];
         [_checkButton addTarget:self action:@selector(checkButtonDidClick) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:_checkButton];
         
-        UIImage *image = [UIImage imageWithName:@"cat_photo_thumb_unselected_icon"];
+        UIImage *image = [UIImage imageWithName:@"cat_photo_kit_photo_unselected_icon"];
         _checkView = [[UIImageView alloc] initWithImage:image];
         _checkView.right = _checkButton.width - 6;
         _checkView.bottom = _checkButton.height - 6;
@@ -91,7 +91,13 @@
 #pragma mark - Public
 - (void)setPhoto:(CATPhoto *)photo {
     _photo = photo;
-    [[CATPhotoManager shareManager] requestAssetImageWithPhoto:photo targetSize:_photoView.frame.size delegate:self];
+    
+    __weak typeof(self) weakSelf = self;
+    [[CATPhotoManager shareManager] requestAssetImageWithPhoto:photo targetSize:_photoView.size complete:^(UIImage *result, NSString *identifier) {
+        if (identifier && result && [weakSelf.photo.localIdentifier isEqualToString:identifier]) {
+            weakSelf.photoView.image = result;
+        }
+    }];
     // 更新照片选中状态
     if (!self.canMultiplePick) {
         _checkButton.hidden = YES;
@@ -121,20 +127,14 @@
 /// 更新照片的选中状态
 - (void)updatePhotoSelectedStatus {
     if (_photo.isSelected) {
-        UIImage *selectedImage = [UIImage imageWithName:@"cat_photo_thumb_selected_icon"];
+        UIImage *selectedImage = [UIImage imageWithName:@"cat_photo_kit_photo_selected_icon"];
         _checkView.image = selectedImage;
     } else {
-        UIImage *defaultImage = [UIImage imageWithName:@"cat_photo_thumb_unselected_icon"];
+        UIImage *defaultImage = [UIImage imageWithName:@"cat_photo_kit_photo_unselected_icon"];
         _checkView.image = defaultImage;
     }
 }
 
-#pragma mark - CATPhotoDownLoadDelegate
-- (void)photoManagerDownLoadSuccess:(CATPhotoManager *)manager result:(UIImage *)result identifier:(NSString *)identifier {
-    if (identifier && result && [self.photo.localIdentifier isEqualToString:identifier]) {
-        self.photoView.image = result;
-    }
-}
 
 #pragma mark - Action
 - (void)checkButtonDidClick {

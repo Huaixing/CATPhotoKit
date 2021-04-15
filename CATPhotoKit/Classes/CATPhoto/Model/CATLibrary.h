@@ -23,19 +23,10 @@ typedef NS_ENUM(NSInteger, CATPhotoFetchSortType) {
     CATPhotoFetchSortTypeDescending = 2,// 按createData降序
 };
 
+/// 请求完成的回调
+typedef void (^CATCompleteHandler)(UIImage *result, NSString *identifier);
+
 @class CATAlbum, CATPhoto, CATPhotoManager;
-
-
-@protocol CATPhotoDownLoadDelegate <NSObject>
-
-@optional
-- (void)photoManagerDownLoadSuccess:(CATPhotoManager *)manager result:(UIImage *)result identifier:(NSString *)identifier;
-
-@end
-
-
-
-
 
 
 
@@ -60,8 +51,8 @@ typedef NS_ENUM(NSInteger, CATPhotoFetchSortType) {
 - (void)fetchAlbumsWithAfterSmartAlbumUserLibraryHandler:(void(^)(NSArray<CATAlbum *> *albums))handler complete:(void(^)(NSArray<CATAlbum *> *albums))complete;
 - (void)fetchPhotosWithCollection:(PHAssetCollection *)colletion config:(CATPhotoFetchConfig *)config handler:(void(^)(NSArray<CATPhoto *> *photos))handler;
 
-- (void)requestAlbumThumbWithAlbum:(CATAlbum *)album targetSize:(CGSize)targetSize delegate:(id<CATPhotoDownLoadDelegate>)delegate;
-- (void)requestAssetImageWithPhoto:(CATPhoto *)photo targetSize:(CGSize)targetSize delegate:(id<CATPhotoDownLoadDelegate>)delegate;
+- (void)requestAlbumThumbWithAlbum:(CATAlbum *)album targetSize:(CGSize)targetSize complete:(CATCompleteHandler)complete;
+- (void)requestAssetImageWithPhoto:(CATPhoto *)photo targetSize:(CGSize)targetSize complete:(CATCompleteHandler)complete;
 
 @end
 

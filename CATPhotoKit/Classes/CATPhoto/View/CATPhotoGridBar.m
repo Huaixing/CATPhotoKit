@@ -1,15 +1,15 @@
 //
-//  CATPhotoSelectedBar.m
+//  CATPhotoGridBar.m
 //  CATPhotoKit
 //
 //  Created by Shihuaixing on 2020/9/8.
 //
 
-#import "CATPhotoSelectedBar.h"
+#import "CATPhotoGridBar.h"
 #import <CATCommonKit/CATCommonKit.h>
 #import "NSString+Bundle.h"
 
-@interface CATPhotoSelectedBar ()
+@interface CATPhotoGridBar ()
 /// content view（适配刘海屏）
 @property (nonatomic, strong) UIView *contentView;
 /// 预览
@@ -20,7 +20,7 @@
 @property (nonatomic, strong) UILabel *textLabel;
 @end
 
-@implementation CATPhotoSelectedBar
+@implementation CATPhotoGridBar
 
 #pragma mark - Init
 - (instancetype)initWithFrame:(CGRect)frame {
@@ -114,8 +114,8 @@
 
 #pragma mark - Action
 - (void)doneButtonDidClick {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(photoSelectedBarDidClickDone:)]) {
-        [self.delegate photoSelectedBarDidClickDone:self];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(photoGridBarDidClickDone:)]) {
+        [self.delegate photoGridBarDidClickDone:self];
     }
 }
 @end

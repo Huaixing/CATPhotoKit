@@ -11,7 +11,7 @@
 #import "CATLibrary.h"
 #import "CATAlbum.h"
 
-@interface CATAlbumCell ()<CATPhotoDownLoadDelegate>
+@interface CATAlbumCell ()
 @property (nonatomic, strong) UIImageView *thumbView;
 @property (nonatomic, strong) UILabel *albumNameLabel;
 
@@ -49,17 +49,15 @@
         _thumbView.image = album.thumbImage;
     } else {
         
-        [[CATPhotoManager shareManager] requestAlbumThumbWithAlbum:album targetSize:_thumbView.size delegate:self];
+        __weak typeof(self) weakSelf = self;
+        [[CATPhotoManager shareManager] requestAlbumThumbWithAlbum:album targetSize:_thumbView.size complete:^(UIImage *result, NSString *identifier) {
+            if (identifier && result && [weakSelf.album.thumbAsset.localIdentifier isEqualToString:identifier]) {
+                weakSelf.thumbView.image = result;
+                weakSelf.album.thumbImage = result;
+            }
+        }];
     }
     _albumNameLabel.text = [NSString stringWithFormat:@"%@----%lu", album.albumName, (unsigned long)album.assetCount];
-}
-
-#pragma mark - CATPhotoDownLoadDelegate
-- (void)photoManagerDownLoadSuccess:(CATPhotoManager *)manager result:(UIImage *)result identifier:(NSString *)identifier {
-    if (identifier && result && [self.album.thumbAsset.localIdentifier isEqualToString:identifier]) {
-        self.thumbView.image = result;
-        self.album.thumbImage = result;
-    }
 }
 
 @end

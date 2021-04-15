@@ -213,7 +213,7 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
     
 }
 
-- (void)requestAlbumThumbWithAlbum:(CATAlbum *)album targetSize:(CGSize)targetSize delegate:(id<CATPhotoDownLoadDelegate>)delegate {
+- (void)requestAlbumThumbWithAlbum:(CATAlbum *)album targetSize:(CGSize)targetSize complete:(CATCompleteHandler)complete {
     
     CGSize size = CGSizeZero;
     if (CGSizeEqualToSize(targetSize, CGSizeZero)) {
@@ -240,18 +240,18 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
     options.resizeMode = PHImageRequestOptionsResizeModeExact;
     options.networkAccessAllowed = YES;
     
-    [[PHImageManager defaultManager] requestImageForAsset:album.thumbAsset targetSize:size contentMode:PHImageContentModeAspectFit options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+    [[PHImageManager defaultManager] requestImageForAsset:album.thumbAsset targetSize:size contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         dispatch_async(dispatch_get_main_queue(), ^{
             NSLog(@"requestImageForAsset --- %@ --- identifier = %@", NSStringFromCGSize(result.size), album.thumbAsset.localIdentifier);
-            if (delegate && [delegate respondsToSelector:@selector(photoManagerDownLoadSuccess:result:identifier:)]) {
-                [delegate photoManagerDownLoadSuccess:self result:result identifier:album.thumbAsset.localIdentifier];
+            if (complete) {
+                complete(result, album.thumbAsset.localIdentifier);
             }
         });
     }];
 }
 
 
-- (void)requestAssetImageWithPhoto:(CATPhoto *)photo targetSize:(CGSize)targetSize delegate:(id<CATPhotoDownLoadDelegate>)delegate {
+- (void)requestAssetImageWithPhoto:(CATPhoto *)photo targetSize:(CGSize)targetSize complete:(CATCompleteHandler)complete {
     
     CGSize size = CGSizeZero;
     if (CGSizeEqualToSize(targetSize, CGSizeZero)) {
@@ -268,7 +268,6 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
             size = CGSizeMake(pixelWidth, pixelHeight);
         }
     }
-    NSLog(@"requestAssetImageWithPhoto --- %@ --- identifier = %@", NSStringFromCGSize(size), photo.asset.localIdentifier);
     
     PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
     options.synchronous = NO;
@@ -278,9 +277,8 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
     
     [[PHImageManager defaultManager] requestImageForAsset:photo.asset targetSize:CGSizeMake(size.width * 1.5, size.height * 1.5) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSLog(@"requestImageForAsset --- %@ --- identifier = %@", NSStringFromCGSize(result.size), photo.asset.localIdentifier);
-            if (delegate && [delegate respondsToSelector:@selector(photoManagerDownLoadSuccess:result:identifier:)]) {
-                [delegate photoManagerDownLoadSuccess:self result:result identifier:photo.localIdentifier];
+            if (complete) {
+                complete(result, photo.localIdentifier);
             }
         });
     }];
