@@ -9,3 +9,7 @@
 "photo_kit_preview_photo"="预览";
 "photo_kit_picker_some_photo_done"="完成 (%ld)";
 "photo_kit_picker_photo_limit_count"="你最多只能选择%ld张照片";
+"photo_kit_limit_alert_ok"="我知道了";
+"photo_kit_authorized_refuse"="没有权限";
+
+"photo_navigation_bar_cancel"="取消";

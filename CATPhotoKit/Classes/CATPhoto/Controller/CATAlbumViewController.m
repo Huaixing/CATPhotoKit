@@ -9,11 +9,13 @@
 #import "CATAlbumViewController.h"
 #import "CATPhotoViewController.h"
 #import "CATPhotoPickerController.h"
-#import <CATCommonKit/CATCommonKit.h>
 
 #import "CATLibrary.h"
 #import "CATAlbumCell.h"
-#import "CATNoAuthorizedView.h"
+#import "NSString+Bundle.h"
+#import "CATAuthorizedTipView.h"
+
+#import <CATCommonKit.h>
 
 @interface CATAlbumViewController ()<UITableViewDataSource, UITableViewDelegate>
 
@@ -23,7 +25,9 @@
 /**loading*/
 @property (nonatomic, strong) UIActivityIndicatorView *loadingView;
 /**no auth*/
-@property (nonatomic, strong) CATNoAuthorizedView *authorizedDefaultView;
+@property (nonatomic, strong) CATAuthorizedTipView *noneAuthorizedTipView;
+/**limit auth*/
+@property (nonatomic, strong) CATAuthorizedTipView *limitAuthorizedTipView;
 
 @end
 
@@ -40,43 +44,97 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.title = @"Album";
-    self.view.backgroundColor = [UIColor whiteColor];
+    
+    self.navigationBar.title = [self barTitle];
+    self.navigationBar.leftBarButton = [CATPhotoBarButton barButtonWithBarButtonType:CATPhotoBarButtonCancel target:self action:@selector(leftButtonClick)];
     
     [self.view addSubview:self.loadingView];
+    [self.view addSubview:self.albumTableView];
+    [self.view addSubview:self.noneAuthorizedTipView];
+    [self.view addSubview:self.limitAuthorizedTipView];
+    
+    self.loadingView.hidden = NO;
     [self.loadingView startAnimating];
     
-    __weak typeof(self) wself = self;
+    @weakify(self);
     [CATLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        __strong typeof(wself) sself = wself;
-        if (!sself) return;
-        if (status == PHAuthorizationStatusAuthorized) {
-            [[CATPhotoManager shareManager] fetchAlbumsWithAfterSmartAlbumUserLibraryHandler:^(NSArray<CATAlbum *> *albums) {
-                
-                if ([self shouldAutoIntoLibrary]) {
-                    // 自动进入照片列表页面
-                    [sself pushPhotoControllerAlbum:[albums firstObject] animated:NO];
-                }
-                
-            } complete:^(NSArray<CATAlbum *> *albums) {
-                
-                [sself.loadingView stopAnimating];
-                [sself.view addSubview:self.albumTableView];
-                
-                [sself.albums removeAllObjects];
-                [sself.albums addObjectsFromArray:albums];
-                
-                [sself.albumTableView reloadData];
-            }];
-        } else {
-            [sself.loadingView stopAnimating];
-            [sself.view addSubview:sself.authorizedDefaultView];
-        }
+        @strongify(self);
+        if (!self) return;
+
+        [self.loadingView stopAnimating];
+        [self handleAuthorizedStatus:status];
     }];
 }
 
 - (void)dealloc {
     NSLog(@" CATAlbumViewController ----- dealloc");
+}
+
+
+#pragma mark - Method
+/// 处理授权后的逻辑
+/// @param status 授权后的状态
+- (void)handleAuthorizedStatus:(PHAuthorizationStatus)status {
+    if (@available(iOS 14.0, *)) {
+        if (status == PHAuthorizationStatusDenied || status == PHAuthorizationStatusRestricted) {
+            /// 拒绝授权/未被授权
+            [self handleUnAuthorizationStatus];
+        } else if (status == PHAuthorizationStatusLimited) {
+            /// 授权部分照片可以访问
+            [self handleLimitedAuthorizationStatus];
+        } else if (status == PHAuthorizationStatusAuthorized) {
+            /// 授权全部照片可以访问
+            [self handleAuthorizationStatus];
+        }
+        
+    } else {
+        if (status == PHAuthorizationStatusDenied || status == PHAuthorizationStatusRestricted) {
+            /// 拒绝授权/未被授权
+            [self handleUnAuthorizationStatus];
+        } else if (status == PHAuthorizationStatusAuthorized) {
+            /// 授权全部照片可以访问
+            [self handleAuthorizationStatus];
+        }
+    }
+}
+
+- (void)handleUnAuthorizationStatus {
+    self.noneAuthorizedTipView.hidden = NO;
+}
+
+- (void)handleLimitedAuthorizationStatus {
+    self.limitAuthorizedTipView.hidden = NO;
+}
+
+- (void)handleAuthorizationStatus {
+    [[CATPhotoManager shareManager] fetchAlbumsWithAfterSmartAlbumUserLibraryHandler:^(NSArray<CATAlbum *> *albums) {
+
+        if ([self shouldAutoIntoLibrary]) {
+            // 自动进入照片列表页面
+            [self pushPhotoControllerAlbum:[albums firstObject] animated:NO];
+        }
+
+    } complete:^(NSArray<CATAlbum *> *albums) {
+        
+        [self.view addSubview:self.albumTableView];
+        self.albumTableView.hidden = NO;
+
+        [self.albums removeAllObjects];
+        [self.albums addObjectsFromArray:albums];
+
+        [self.albumTableView reloadData];
+    }];
+}
+
+
+#pragma mark - Event
+- (void)leftButtonClick {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)handleContinueLimitAuth {
+    self.limitAuthorizedTipView.hidden = YES;
+    [self handleAuthorizationStatus];
 }
 
 #pragma mark - Getter
@@ -91,13 +149,14 @@
 - (UITableView *)albumTableView {
     if (!_albumTableView) {
         _albumTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
-        _albumTableView.backgroundColor = [UIColor whiteColor];
+        _albumTableView.backgroundColor = [UIColor clearColor];
         _albumTableView.delegate = self;
         _albumTableView.dataSource = self;
         _albumTableView.cellLayoutMarginsFollowReadableWidth = NO;
         _albumTableView.estimatedRowHeight = 0;
         _albumTableView.estimatedSectionHeaderHeight = 0;
         _albumTableView.estimatedSectionFooterHeight = 0;
+        _albumTableView.hidden = YES;
     }
     return _albumTableView;
 }
@@ -109,18 +168,32 @@
         } else {
             _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         }
-        
-        _loadingView.center = CGPointMake(self.view.width / 2.0, self.view.height / 2.0);
-        _loadingView.hidesWhenStopped = YES;
+        _loadingView.center = CGPointMake(CGRectGetWidth(self.view.frame) / 2.0, CGRectGetHeight(self.view.frame) / 2.0);
+        _loadingView.hidden = YES;
     }
     return _loadingView;
 }
 
-- (CATNoAuthorizedView *)authorizedDefaultView {
-    if (!_authorizedDefaultView) {
-        _authorizedDefaultView = [[CATNoAuthorizedView alloc] initWithFrame:self.view.bounds iconName:nil message:@"允许使用本地相册权限"];
+- (CATAuthorizedTipView *)noneAuthorizedTipView {
+    if (!_noneAuthorizedTipView) {
+        _noneAuthorizedTipView = [[CATAuthorizedTipView alloc] initNoneAuthViewWithFrame:self.view.bounds];
+        _noneAuthorizedTipView.hidden = YES;
     }
-    return _authorizedDefaultView;
+    return _noneAuthorizedTipView;
+}
+
+- (CATAuthorizedTipView *)limitAuthorizedTipView {
+    if (!_limitAuthorizedTipView) {
+        _limitAuthorizedTipView = [[CATAuthorizedTipView alloc] initLimitAuthViewWithFrame:self.view.bounds];
+        _limitAuthorizedTipView.hidden = YES;
+        
+        @weakify(self);
+        _limitAuthorizedTipView.handleAction = ^{
+            @strongify(self);
+            [self handleContinueLimitAuth];
+        };
+    }
+    return _limitAuthorizedTipView;
 }
 
 #pragma mark - Private
@@ -128,6 +201,11 @@
 /// 是否自动进入全部照片相册
 - (BOOL)shouldAutoIntoLibrary {
     return (((CATPhotoPickerController *)self.navigationController).autoIntoLibrary);
+}
+
+/// 是否自动进入全部照片相册
+- (NSString *)barTitle {
+    return (((CATPhotoPickerController *)self.navigationController).title);
 }
 
 - (void)pushPhotoControllerAlbum:(CATAlbum *)album animated:(BOOL)animated {

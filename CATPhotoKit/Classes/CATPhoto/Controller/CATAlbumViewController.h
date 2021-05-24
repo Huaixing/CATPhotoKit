@@ -6,11 +6,9 @@
 //  Copyright © 2020 Shihuaixing. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
+#import "CATPhotoBaseViewController.h"
 
-
-
-@interface CATAlbumViewController : UIViewController
+@interface CATAlbumViewController : CATPhotoBaseViewController
 
 @end
 

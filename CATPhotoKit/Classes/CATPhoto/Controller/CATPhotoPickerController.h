@@ -47,6 +47,4 @@ typedef NS_ENUM(NSInteger, CATPickMode) {
 /// 自动进入所有照片相册，default YES
 @property (nonatomic, assign) BOOL autoIntoLibrary;
 
-
-
 @end

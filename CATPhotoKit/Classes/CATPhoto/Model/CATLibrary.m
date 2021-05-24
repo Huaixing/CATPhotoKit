@@ -301,21 +301,40 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
 @implementation CATLibrary
 
 + (void)requestAuthorization:(void(^)(PHAuthorizationStatus status))handler {
-    
-    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    if (status == PHAuthorizationStatusNotDetermined) {
-        // 相册还未授权
-        [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (handler) {
-                    handler(status);
-                }
-            });
-        }];
+    if (@available(iOS 14.0, *)) {
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatusForAccessLevel:PHAccessLevelReadWrite];
+        if (status == PHAuthorizationStatusNotDetermined) {
+            // 相册还未授权
+            [PHPhotoLibrary requestAuthorizationForAccessLevel:PHAccessLevelReadWrite handler:^(PHAuthorizationStatus status) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (handler) {
+                        handler(status);
+                    }
+                });
+            }];
+        } else {
+            // 相册已经授权（可访问/不可访问）
+            if (handler) {
+                handler(status);
+            }
+        }
+        
     } else {
-        // 相册已经授权（可访问/不可访问）
-        if (handler) {
-            handler(status);
+        PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+        if (status == PHAuthorizationStatusNotDetermined) {
+            // 相册还未授权
+            [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (handler) {
+                        handler(status);
+                    }
+                });
+            }];
+        } else {
+            // 相册已经授权（可访问/不可访问）
+            if (handler) {
+                handler(status);
+            }
         }
     }
 }

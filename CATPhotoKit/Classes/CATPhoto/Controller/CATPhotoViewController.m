@@ -9,8 +9,6 @@
 #import "CATPhotoViewController.h"
 
 #import "CATPhotoPickerController.h"
-#import <CATCommonKit/CATCommonKit.h>
-#import <MBProgressHUD/MBProgressHUD.h>
 
 #import "CATLibrary.h"
 #import "CATAlbum.h"
@@ -18,6 +16,7 @@
 #import "CATPhoto.h"
 #import "CATPhotoGridBar.h"
 #import "NSString+Bundle.h"
+#import <CATCommonKit.h>
 
 
 @interface CATPhotoViewController ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate, CATPhotoCellDelegate, CATPhotoGridBarDelegate>
@@ -53,13 +52,15 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.view.backgroundColor = [UIColor whiteColor];
+    
+    /// 导航栏
+    self.navigationBar.leftBarButton = [CATPhotoBarButton barButtonWithBarButtonType:CATPhotoBarButtonBack target:self action:@selector(leftButtonClick)];
     
     _selectedBar = [[CATPhotoGridBar alloc] init];
     _selectedBar.delegate = self;
     [self.view addSubview:_selectedBar];
-    CGFloat barHeight = 54 + [UIView bottomInset];
-    _selectedBar.frame = CGRectMake(0, self.view.height - barHeight, self.view.width, barHeight);
+    CGFloat barHeight = 54 + [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;
+    _selectedBar.frame = CGRectMake(0, CGRectGetHeight(self.view.frame) - barHeight, CGRectGetWidth(self.view.frame), barHeight);
     _selectedBar.hidden = ![self canMultiplePick];
     
     
@@ -67,24 +68,25 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     _space = ((CATPhotoPickerController *)self.navigationController).space;
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, self.view.width, self.view.height - (_selectedBar.isHidden ? 0 : _selectedBar.height)) collectionViewLayout:flowLayout];
-    _collectionView.backgroundColor = [UIColor whiteColor];
+    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame) - (_selectedBar.isHidden ? 0 : CGRectGetHeight(_selectedBar.frame))) collectionViewLayout:flowLayout];
+    _collectionView.backgroundColor = [UIColor clearColor];
     _collectionView.delegate = self;
     _collectionView.dataSource = self;
+    _collectionView.alwaysBounceVertical = YES;
     [self.view addSubview:_collectionView];
     
     [_collectionView registerClass:[CATPhotoCell class] forCellWithReuseIdentifier:CATPhotoIdentifier];
     
-    __weak typeof(self) wself = self;
+    @weakify(self);
     [[CATPhotoManager shareManager] fetchPhotosWithCollection:self.album.collection config:nil handler:^(NSArray<CATPhoto *> *photos) {
-        __strong typeof(wself) sself = wself;
-        if (!sself) return;
-        [sself.photos removeAllObjects];
-        [sself.photos addObjectsFromArray:photos];
-        [sself.collectionView reloadData];
+        @strongify(self);
+        if (!self) return;
+        [self.photos removeAllObjects];
+        [self.photos addObjectsFromArray:photos];
+        [self.collectionView reloadData];
         // 滚动最近照片的位置
         if (photos.count) {
-            [sself.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:(photos.count - 1) inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
+            [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:(photos.count - 1) inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
         }
     }];
 }
@@ -109,6 +111,11 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
         return 0;
     }
     return ((CATPhotoPickerController *)self.navigationController).limitPhotoCount;
+}
+
+#pragma mark - Event
+- (void)leftButtonClick {
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 #pragma mark - Getter
@@ -182,24 +189,19 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
         // 将要勾选
         if (self.seletedPhotos.count >= [self limitPhotoCount]) {
             // 勾选已达上限，toast
-            NSString *message = [NSString stringWithFormat:[NSString lcoalizationString:@"photo_kit_picker_photo_limit_count"], self.seletedPhotos.count];
-            [self showToastWithMessage:message inView:self.view];
+            NSString *message = [NSString stringWithFormat:[NSString localizationString:@"photo_kit_picker_photo_limit_count"], self.seletedPhotos.count];
+            [self showAlertWithMessage:message];
             return NO;
         }
     }
     return YES;
 }
 
-- (void)showToastWithMessage:(NSString *)message inView:(UIView *)inView {
-    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:inView animated:YES];
-    hud.mode = MBProgressHUDModeText;
-    hud.square = NO;
-    hud.detailsLabel.font = [UIFont boldSystemFontOfSize:17.0];
-    hud.detailsLabel.textColor = [UIColor blackColor];
-    hud.detailsLabel.text = message;
-    hud.removeFromSuperViewOnHide = YES;
-    hud.userInteractionEnabled = NO;
-    [hud hideAnimated:YES afterDelay:2.0];
+- (void)showAlertWithMessage:(NSString *)message {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:message message:nil preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:[NSString localizationString:@"photo_kit_limit_alert_ok"] style:UIAlertActionStyleCancel handler:nil];
+    [alert addAction:action];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)photoCell:(CATPhotoCell *)photoCell didSelectedPhoto:(CATPhoto *)photo {

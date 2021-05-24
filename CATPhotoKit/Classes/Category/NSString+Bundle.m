@@ -8,7 +8,7 @@
 #import "NSString+Bundle.h"
 
 @implementation NSString (Bundle)
-+ (NSString *)lcoalizationString:(NSString *)text {
++ (NSString *)localizationString:(NSString *)text {
     NSURL *bundleUrl = [[NSBundle mainBundle] URLForResource:@"CATPhotoKit" withExtension:@"bundle"];
     NSBundle *bundle = [NSBundle bundleWithURL:bundleUrl];
     NSString *ret = [bundle localizedStringForKey:text value:@"" table:nil];

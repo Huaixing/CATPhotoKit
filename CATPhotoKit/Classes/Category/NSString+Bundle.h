@@ -9,6 +9,6 @@
 
 
 @interface NSString (Bundle)
-+ (NSString *)lcoalizationString:(NSString *)text;
++ (NSString *)localizationString:(NSString *)text;
 @end
 

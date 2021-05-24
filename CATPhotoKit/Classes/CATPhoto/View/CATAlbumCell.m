@@ -6,7 +6,6 @@
 //  Copyright © 2020 Shihuaixing. All rights reserved.
 //
 
-#import <CATCommonKit/CATCommonKit.h>
 #import "CATAlbumCell.h"
 #import "CATLibrary.h"
 #import "CATAlbum.h"
@@ -22,8 +21,7 @@
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
         
-        _thumbView = [[UIImageView alloc] init];
-        _thumbView.size = CGSizeMake(80, 80);
+        _thumbView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
         _thumbView.backgroundColor = [UIColor clearColor];
         _thumbView.contentMode = UIViewContentModeScaleAspectFill;
         _thumbView.clipsToBounds = YES;
@@ -37,8 +35,12 @@
 
 - (void)layoutSubviews {
     [super layoutSubviews];
-    _thumbView.centerY = self.height / 2.0;
-    _albumNameLabel.frame = CGRectMake(_thumbView.right + 16, 0, 200, self.height);
+    
+    CGRect thumbFrame = _thumbView.frame;
+    thumbFrame.origin.y = (CGRectGetHeight(self.frame) - CGRectGetHeight(_thumbView.frame)) / 2.0;
+    _thumbView.frame = thumbFrame;
+    
+    _albumNameLabel.frame = CGRectMake(CGRectGetMaxX(_thumbView.frame) + 16, 0, 200, CGRectGetHeight(self.frame));
 }
 
 - (void)setAlbum:(CATAlbum *)album {
@@ -50,7 +52,7 @@
     } else {
         
         __weak typeof(self) weakSelf = self;
-        [[CATPhotoManager shareManager] requestAlbumThumbWithAlbum:album targetSize:_thumbView.size complete:^(UIImage *result, NSString *identifier) {
+        [[CATPhotoManager shareManager] requestAlbumThumbWithAlbum:album targetSize:_thumbView.frame.size complete:^(UIImage *result, NSString *identifier) {
             if (identifier && result && [weakSelf.album.thumbAsset.localIdentifier isEqualToString:identifier]) {
                 weakSelf.thumbView.image = result;
                 weakSelf.album.thumbImage = result;
