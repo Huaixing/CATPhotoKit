@@ -23,6 +23,7 @@
 		62B7B7DC6644403B2DD7E2E4 /* libPods-CATPhotoKit_Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B3577EA1781B0E39446AD367 /* libPods-CATPhotoKit_Tests.a */; };
 		71719F9F1E33DC2100824A3D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 71719F9D1E33DC2100824A3D /* LaunchScreen.storyboard */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
+		A77C691D634737E088FD40A9 /* libPods-CATPhotoKit_Example.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B701A71334461CEB639F6D3 /* libPods-CATPhotoKit_Example.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +77,7 @@
 				6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */,
 				6003F592195388D20070C39A /* UIKit.framework in Frameworks */,
 				6003F58E195388D20070C39A /* Foundation.framework in Frameworks */,
+				A77C691D634737E088FD40A9 /* libPods-CATPhotoKit_Example.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

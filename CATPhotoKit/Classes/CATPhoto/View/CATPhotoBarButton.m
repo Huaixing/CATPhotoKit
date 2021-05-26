@@ -74,11 +74,8 @@
         return;
     }
     self.backView.frame = self.bounds;
-    self.backIconView.x = 0;
     self.backIconView.centerY = self.backView.height / 2.0;
 }
-
-
 
 - (void)layoutCancelTypeView {
     if (_barButtonType != CATPhotoBarButtonCancel) {
@@ -92,6 +89,7 @@
     if (!_backView) {
         _backView = [[UIView alloc] init];
         _backView.backgroundColor = [UIColor clearColor];
+        _backView.userInteractionEnabled = NO;
         _backView.hidden = YES;
     }
     return _backView;
@@ -110,6 +108,7 @@
     if (!_cancelView) {
         _cancelView = [[UIView alloc] init];
         _cancelView.backgroundColor = [UIColor clearColor];
+        _cancelView.userInteractionEnabled = NO;
         _cancelView.hidden = YES;
     }
     return _cancelView;

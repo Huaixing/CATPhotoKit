@@ -14,17 +14,17 @@
 #import "CATAlbum.h"
 #import "CATPhotoCell.h"
 #import "CATPhoto.h"
-#import "CATPhotoGridBar.h"
+#import "CATPhotoViewBar.h"
 #import "NSString+Bundle.h"
 #import <CATCommonKit.h>
 
 
-@interface CATPhotoViewController ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate, CATPhotoCellDelegate, CATPhotoGridBarDelegate>
+@interface CATPhotoViewController ()<UICollectionViewDelegateFlowLayout, UICollectionViewDataSource, UICollectionViewDelegate, CATPhotoCellDelegate, CATPhotoViewBarDelegate>
 /***/
 @property (nonatomic, strong) NSMutableArray<CATPhoto *> *photos;
 @property (nonatomic, strong) UICollectionView *collectionView;
 /// 底部选择栏
-@property (nonatomic, strong) CATPhotoGridBar *selectedBar;
+@property (nonatomic, strong) CATPhotoViewBar *photoViewBar;
 
 
 /**照片列表中一行多少个，default 4*/
@@ -56,19 +56,19 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     /// 导航栏
     self.navigationBar.leftBarButton = [CATPhotoBarButton barButtonWithBarButtonType:CATPhotoBarButtonBack target:self action:@selector(leftButtonClick)];
     
-    _selectedBar = [[CATPhotoGridBar alloc] init];
-    _selectedBar.delegate = self;
-    [self.view addSubview:_selectedBar];
+    _photoViewBar = [[CATPhotoViewBar alloc] init];
+    _photoViewBar.delegate = self;
+    [self.view addSubview:_photoViewBar];
     CGFloat barHeight = 54 + [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;
-    _selectedBar.frame = CGRectMake(0, CGRectGetHeight(self.view.frame) - barHeight, CGRectGetWidth(self.view.frame), barHeight);
-    _selectedBar.hidden = ![self canMultiplePick];
+    _photoViewBar.frame = CGRectMake(0, CGRectGetHeight(self.view.frame) - barHeight, CGRectGetWidth(self.view.frame), barHeight);
+    _photoViewBar.hidden = ![self canMultiplePick];
     
     
-    _columns = ((CATPhotoPickerController *)self.navigationController).columns;
-    _space = ((CATPhotoPickerController *)self.navigationController).space;
+    _columns = [self columnsCount];
+    _space = [self betweenSpace];
     
     UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame) - (_selectedBar.isHidden ? 0 : CGRectGetHeight(_selectedBar.frame))) collectionViewLayout:flowLayout];
+    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame) - (_photoViewBar.isHidden ? 0 : CGRectGetHeight(_photoViewBar.frame))) collectionViewLayout:flowLayout];
     _collectionView.backgroundColor = [UIColor clearColor];
     _collectionView.delegate = self;
     _collectionView.dataSource = self;
@@ -105,12 +105,29 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     }
     return ((CATPhotoPickerController *)self.navigationController).pickMode == CATPickModeMultiplePick;
 }
+
 /// 照片勾选数量上限，default 9
 - (NSUInteger)limitPhotoCount {
     if (![self.navigationController isKindOfClass:[CATPhotoPickerController class]]) {
-        return 0;
+        return 9;
     }
     return ((CATPhotoPickerController *)self.navigationController).limitPhotoCount;
+}
+
+/// 照片列表中一行多少个，default 4
+- (NSUInteger)columnsCount {
+    if (![self.navigationController isKindOfClass:[CATPhotoPickerController class]]) {
+        return 4;
+    }
+    return ((CATPhotoPickerController *)self.navigationController).columns;
+}
+
+/// 照片列表中每两个照片之间的间距，default 1.0
+- (CGFloat)betweenSpace {
+    if (![self.navigationController isKindOfClass:[CATPhotoPickerController class]]) {
+        return 1.0;
+    }
+    return ((CATPhotoPickerController *)self.navigationController).space;
 }
 
 #pragma mark - Event
@@ -158,7 +175,7 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
             [self.seletedPhotos addObject:photo];
         }
         if (self.seletedPhotos.count) {
-            [self photoSelectedBarDidClickDone:nil];
+            [self photoViewBarDidClickDone:_photoViewBar];
         }
         return;
     }
@@ -211,11 +228,11 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     } else {
         [self.seletedPhotos removeObject:photo];
     }
-    _selectedBar.count = self.seletedPhotos.count;
+    _photoViewBar.count = self.seletedPhotos.count;
 }
 
 #pragma mark - CATPhotoGridBarDelegate
-- (void)photoSelectedBarDidClickDone:(CATPhotoGridBar *)selectedBar {
+- (void)photoViewBarDidClickDone:(CATPhotoViewBar *)photoViewBar {
     /// 回传给导航栏，让导航栏跟外界交涉。最后的结果都将以导航栏的形式传给外界
     if (self.navigationController) {
         SEL selector = NSSelectorFromString(@"photoViewControllerDidFinishPickPhotos:");
