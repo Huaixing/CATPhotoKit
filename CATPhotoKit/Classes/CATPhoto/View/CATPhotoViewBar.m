@@ -38,10 +38,11 @@
         [_previewButton setTitle:[NSString localizationString:@"photo_kit_preview_photo"] forState:UIControlStateNormal];
         _previewButton.titleLabel.font = [UIFont systemFontOfSize:16];
         [_previewButton setTitleColor:[UIColor colorWithHexString:@"0x181818"] forState:UIControlStateNormal];
+        [_previewButton addTarget:self action:@selector(previewButtonDidClick) forControlEvents:UIControlEventTouchUpInside];
         [_contentView addSubview:_previewButton];
         
         _doneButton = [[UIButton alloc] init];
-        _doneButton.backgroundColor = [UIColor lightGrayColor];
+        _doneButton.backgroundColor = [UIColor colorWithHexString:@"0xF66071"];
         _doneButton.exclusiveTouch = YES;
         _doneButton.layer.cornerRadius = 4.0;
         _doneButton.clipsToBounds = YES;
@@ -62,7 +63,7 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    _contentView.frame = CGRectMake(0, 0, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame) - [UIView safeAreaInsetsBottom]);
+    _contentView.frame = CGRectMake(0, 0, self.width, self.height - [UIView safeAreaInsetsBottom]);
     
     CGFloat preWidth = [_previewButton.titleLabel.text cat_sizeWithFont:_previewButton.titleLabel.font limitWidth:100].width;
     // 预览两个字距离左屏幕距离
@@ -73,27 +74,36 @@
     _textLabel.frame = CGRectMake(0, 0, countWidth, _textLabel.font.lineHeight);
     
     // 完成按钮上文案距离按钮左右距离
-    CGFloat insert = 6.0;
+    CGFloat insert = 12.0;
     // 完成按钮距离contentView上下边缘的距离
     CGFloat doneMargin = 12.0;
-    CGFloat doneWidth = CGRectGetWidth(_textLabel.frame) + 2 * insert;
-    CGFloat doneX = CGRectGetWidth(_contentView.frame) - doneWidth - preMargin;
-    _doneButton.frame = CGRectMake(doneX, doneMargin, doneWidth, CGRectGetHeight(_contentView.frame) - 2 * doneMargin);
-    _textLabel.center = CGPointMake(CGRectGetWidth(_doneButton.frame) / 2.0, CGRectGetHeight(_doneButton.frame) / 2.0);
+    CGFloat doneWidth = _textLabel.width + 2 * insert;
+    CGFloat doneX = _contentView.width - doneWidth - preMargin;
+    _doneButton.frame = CGRectMake(doneX, doneMargin, doneWidth, _contentView.height - 2 * doneMargin);
+    _textLabel.center = CGPointMake(_doneButton.width / 2.0, _doneButton.height / 2.0);
 }
 
 #pragma mark - Private
+
+- (void)barEnabled:(BOOL)enabled {
+    _previewButton.enabled = enabled;
+    _doneButton.enabled = enabled;
+    if (enabled) {
+        _previewButton.alpha = 1.0;
+        _doneButton.alpha = 1.0;
+    } else {
+        _previewButton.alpha = 0.3;
+        _doneButton.alpha = 0.3;
+    }
+}
+
 /// 没有选中任何照片时候的UI
 - (void)updateUnselectedStatus {
-    [_previewButton setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
-    _doneButton.backgroundColor = [UIColor lightGrayColor];
     _textLabel.text = [NSString localizationString:@"photo_kit_picker_done"];
 }
 
 /// 有选中照片时的UI
 - (void)updateSelectedStatus {
-    [_previewButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
-    _doneButton.backgroundColor = [UIColor blackColor];
     NSString *countString = [NSString stringWithFormat:[NSString localizationString:@"photo_kit_picker_some_photo_done"], (long)_count];
     
     _textLabel.text = countString;
@@ -108,6 +118,7 @@
     } else {
         [self updateUnselectedStatus];
     }
+    [self barEnabled:(count != 0)];
     
     [self setNeedsLayout];
     [self layoutIfNeeded];
@@ -119,4 +130,11 @@
         [self.delegate photoViewBarDidClickDone:self];
     }
 }
+
+- (void)previewButtonDidClick {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(photoViewBarDidClickPreview:)]) {
+        [self.delegate photoViewBarDidClickPreview:self];
+    }
+}
+
 @end

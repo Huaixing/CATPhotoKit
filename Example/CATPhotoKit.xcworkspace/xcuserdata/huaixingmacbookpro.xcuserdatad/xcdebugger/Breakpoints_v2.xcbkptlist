@@ -7,16 +7,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "42FCD359-437C-4DED-B15F-211A068D6081"
+            uuid = "8C078406-4FEF-4D85-A0F0-9BC2EEA37393"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "../CATPhotoKit/Classes/CATPhoto/Controller/CATPhotoViewController.m"
+            filePath = "../CATPhotoKit/Classes/CATPhoto/View/CATPhotoViewBar.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "237"
-            endingLineNumber = "237"
-            landmarkName = "-photoViewBarDidClickDone:"
+            startingLineNumber = "129"
+            endingLineNumber = "129"
+            landmarkName = "-doneButtonDidClick"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -6,7 +6,6 @@ platform :ios, '11.0'
 target 'CATPhotoKit_Example' do
   pod 'CATPhotoKit', :path => '../'
   pod 'CATCommonKit'
-  pod 'Masonry', '~> 1.1.0'
 
   target 'CATPhotoKit_Tests' do
     inherit! :search_paths

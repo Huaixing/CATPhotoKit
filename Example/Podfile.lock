@@ -2,17 +2,12 @@ PODS:
   - CATCommonKit (0.2.5)
   - CATPhotoKit (0.1.8):
     - CATCommonKit
-    - Masonry (~> 1.1.0)
-  - Masonry (1.1.0)
 
 DEPENDENCIES:
   - CATCommonKit
   - CATPhotoKit (from `../`)
-  - Masonry (~> 1.1.0)
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
-    - Masonry
   https://github.com/Huaixing/CATMasterRepos.git:
     - CATCommonKit
 
@@ -22,9 +17,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   CATCommonKit: bb4799fa8cc2c554f34b824b81b1d6a0137ddbdd
-  CATPhotoKit: 50216cc8dfa697489be3bac5cc97cecd478d4413
-  Masonry: 678fab65091a9290e40e2832a55e7ab731aad201
+  CATPhotoKit: ec625e9c670a7929e3694a4f5394c014eee0eb05
 
-PODFILE CHECKSUM: f24f6058de9e3eda70151d856e0f04caf4fe0380
+PODFILE CHECKSUM: 987e268daae1347ace82d82048c2d0f2280face0
 
 COCOAPODS: 1.10.0

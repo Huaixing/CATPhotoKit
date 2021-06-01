@@ -36,7 +36,6 @@
 @property (nonatomic, strong) NSMutableArray<CATPhoto *> *seletedPhotos;
 @end
 
-static NSString *CATPhotoIdentifier = @"PhotoCell";
 @implementation CATPhotoViewController
 
 #pragma mark - Left
@@ -55,30 +54,19 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     
     /// 导航栏
     self.navigationBar.leftBarButton = [CATPhotoBarButton barButtonWithBarButtonType:CATPhotoBarButtonBack target:self action:@selector(leftButtonClick)];
-    
-    _photoViewBar = [[CATPhotoViewBar alloc] init];
-    _photoViewBar.delegate = self;
-    [self.view addSubview:_photoViewBar];
-    CGFloat barHeight = 54 + [UIApplication sharedApplication].keyWindow.safeAreaInsets.bottom;
-    _photoViewBar.frame = CGRectMake(0, CGRectGetHeight(self.view.frame) - barHeight, CGRectGetWidth(self.view.frame), barHeight);
-    _photoViewBar.hidden = ![self canMultiplePick];
+    self.navigationBar.title = _album.albumName;
     
     
+    [self.view addSubview:self.photoViewBar];
+    /// 设置默认选中个数
+    _photoViewBar.count = 0;
+    
+    [self.view addSubview:self.collectionView];
     _columns = [self columnsCount];
     _space = [self betweenSpace];
     
-    UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.view.frame), CGRectGetHeight(self.view.frame) - (_photoViewBar.isHidden ? 0 : CGRectGetHeight(_photoViewBar.frame))) collectionViewLayout:flowLayout];
-    _collectionView.backgroundColor = [UIColor clearColor];
-    _collectionView.delegate = self;
-    _collectionView.dataSource = self;
-    _collectionView.alwaysBounceVertical = YES;
-    [self.view addSubview:_collectionView];
-    
-    [_collectionView registerClass:[CATPhotoCell class] forCellWithReuseIdentifier:CATPhotoIdentifier];
-    
     @weakify(self);
-    [[CATPhotoManager shareManager] fetchPhotosWithCollection:self.album.collection config:nil handler:^(NSArray<CATPhoto *> *photos) {
+    [[CATPhotoManager shareManager] fetchPhotosWithCollection:_album.collection config:nil handler:^(NSArray<CATPhoto *> *photos) {
         @strongify(self);
         if (!self) return;
         [self.photos removeAllObjects];
@@ -91,6 +79,19 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     }];
 }
 
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    if (!self.layoutedSubviews) {
+        self.layoutedSubviews = YES;
+        
+        CGFloat barHeight = 54 + [UIView safeAreaInsetsBottom];
+        _photoViewBar.frame = CGRectMake(0, 0, self.viewFrame.size.width, barHeight);
+        _photoViewBar.bottom = self.view.bottom;
+        
+        _collectionView.frame = self.viewFrame;
+        _collectionView.height -= (_photoViewBar.isHidden ? 0 : _photoViewBar.height);
+    }
+}
 
 - (void)dealloc {
     NSLog(@" CATPhotoViewController ----- dealloc");
@@ -130,24 +131,17 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     return ((CATPhotoPickerController *)self.navigationController).space;
 }
 
+
+- (void)showAlertWithMessage:(NSString *)message {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:message message:nil preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *action = [UIAlertAction actionWithTitle:[NSString localizationString:@"photo_kit_limit_alert_ok"] style:UIAlertActionStyleCancel handler:nil];
+    [alert addAction:action];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 #pragma mark - Event
 - (void)leftButtonClick {
     [self.navigationController popViewControllerAnimated:YES];
-}
-
-#pragma mark - Getter
-- (NSMutableArray<CATPhoto *> *)photos {
-    if (!_photos) {
-        _photos = [[NSMutableArray alloc] init];
-    }
-    return _photos;
-}
-
-- (NSMutableArray<CATPhoto *> *)seletedPhotos {
-    if (!_seletedPhotos) {
-        _seletedPhotos = [[NSMutableArray alloc] init];
-    }
-    return _seletedPhotos;
 }
 
 #pragma mark - UICollectionViewDataSource
@@ -157,7 +151,7 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
 
 - (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
-    CATPhotoCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:CATPhotoIdentifier forIndexPath:indexPath];
+    CATPhotoCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:NSStringFromClass([CATPhotoCell class]) forIndexPath:indexPath];
     CATPhoto *photo = [self.photos objectAtIndex:indexPath.item];
     cell.delegate = self;
     cell.canMultiplePick = [self canMultiplePick];
@@ -185,7 +179,7 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
 #pragma mark - UICollectionViewDelegateFlowLayout
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
     
-    CGFloat itemWH = (CGRectGetWidth(self.view.frame) - (_columns + 1) * _space) / _columns;
+    CGFloat itemWH = (self.view.width - (_columns + 1) * _space) / _columns;
     return CGSizeMake(itemWH, itemWH);
 }
 
@@ -214,13 +208,6 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     return YES;
 }
 
-- (void)showAlertWithMessage:(NSString *)message {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:message message:nil preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *action = [UIAlertAction actionWithTitle:[NSString localizationString:@"photo_kit_limit_alert_ok"] style:UIAlertActionStyleCancel handler:nil];
-    [alert addAction:action];
-    [self presentViewController:alert animated:YES completion:nil];
-}
-
 - (void)photoCell:(CATPhotoCell *)photoCell didSelectedPhoto:(CATPhoto *)photo {
     
     if (photo.isSelected) {
@@ -244,5 +231,55 @@ static NSString *CATPhotoIdentifier = @"PhotoCell";
     }
 }
 
+- (void)photoViewBarDidClickPreview:(CATPhotoViewBar *)selectedBar {
+    /// 回传给导航栏，让导航栏跟外界交涉。最后的结果都将以导航栏的形式传给外界
+    if (self.navigationController) {
+        SEL selector = NSSelectorFromString(@"photoViewControllerDidPreviewPhotos:");
+        if ([self.navigationController respondsToSelector:selector]) {
+            IMP imp = [self.navigationController methodForSelector:selector];
+            void (*func)(id, SEL, NSArray *) = (void *)imp;
+            func (self.navigationController, selector, self.seletedPhotos);
+        }
+    }
+}
+
+
+#pragma mark - Getter
+- (NSMutableArray<CATPhoto *> *)photos {
+    if (!_photos) {
+        _photos = [[NSMutableArray alloc] init];
+    }
+    return _photos;
+}
+
+- (NSMutableArray<CATPhoto *> *)seletedPhotos {
+    if (!_seletedPhotos) {
+        _seletedPhotos = [[NSMutableArray alloc] init];
+    }
+    return _seletedPhotos;
+}
+
+- (CATPhotoViewBar *)photoViewBar {
+    if (!_photoViewBar) {
+        _photoViewBar = [[CATPhotoViewBar alloc] init];
+        _photoViewBar.delegate = self;
+        _photoViewBar.hidden = ![self canMultiplePick];
+    }
+    return _photoViewBar;
+}
+
+- (UICollectionView *)collectionView {
+    if (!_collectionView) {
+        UICollectionViewFlowLayout *flowLayout = [[UICollectionViewFlowLayout alloc] init];
+        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:flowLayout];
+        _collectionView.backgroundColor = [UIColor clearColor];
+        _collectionView.delegate = self;
+        _collectionView.dataSource = self;
+        _collectionView.alwaysBounceVertical = YES;
+        _collectionView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        [_collectionView registerClass:[CATPhotoCell class] forCellWithReuseIdentifier:NSStringFromClass([CATPhotoCell class])];
+    }
+    return _collectionView;
+}
 
 @end

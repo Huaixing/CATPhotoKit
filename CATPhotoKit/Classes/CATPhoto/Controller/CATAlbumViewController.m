@@ -48,6 +48,7 @@
     self.navigationBar.title = [self barTitle];
     self.navigationBar.leftBarButton = [CATPhotoBarButton barButtonWithBarButtonType:CATPhotoBarButtonCancel target:self action:@selector(leftButtonClick)];
     
+    
     [self.view addSubview:self.loadingView];
     [self.view addSubview:self.albumTableView];
     [self.view addSubview:self.noneAuthorizedTipView];
@@ -64,6 +65,17 @@
         [self.loadingView stopAnimating];
         [self handleAuthorizedStatus:status];
     }];
+}
+
+- (void)viewWillLayoutSubviews {
+    [super viewWillLayoutSubviews];
+    if (!self.layoutedSubviews) {
+        self.layoutedSubviews = YES;
+        self.loadingView.center = CGPointMake(CGRectGetWidth(self.viewFrame) / 2.0, CGRectGetHeight(self.viewFrame) / 2.0);
+        self.albumTableView.frame = self.viewFrame;
+        self.noneAuthorizedTipView.frame = self.viewFrame;
+        self.limitAuthorizedTipView.frame = self.viewFrame;
+    }
 }
 
 - (void)dealloc {
@@ -137,65 +149,6 @@
     [self handleAuthorizationStatus];
 }
 
-#pragma mark - Getter
-
-- (NSMutableArray<CATAlbum *> *)albums {
-    if (!_albums) {
-        _albums = [[NSMutableArray alloc] init];
-    }
-    return _albums;
-}
-
-- (UITableView *)albumTableView {
-    if (!_albumTableView) {
-        _albumTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
-        _albumTableView.backgroundColor = [UIColor clearColor];
-        _albumTableView.delegate = self;
-        _albumTableView.dataSource = self;
-        _albumTableView.cellLayoutMarginsFollowReadableWidth = NO;
-        _albumTableView.estimatedRowHeight = 0;
-        _albumTableView.estimatedSectionHeaderHeight = 0;
-        _albumTableView.estimatedSectionFooterHeight = 0;
-        _albumTableView.hidden = YES;
-    }
-    return _albumTableView;
-}
-
-- (UIActivityIndicatorView *)loadingView {
-    if (!_loadingView) {
-        if (@available(iOS 13.0, *)) {
-            _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
-        } else {
-            _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        }
-        _loadingView.center = CGPointMake(CGRectGetWidth(self.view.frame) / 2.0, CGRectGetHeight(self.view.frame) / 2.0);
-        _loadingView.hidden = YES;
-    }
-    return _loadingView;
-}
-
-- (CATAuthorizedTipView *)noneAuthorizedTipView {
-    if (!_noneAuthorizedTipView) {
-        _noneAuthorizedTipView = [[CATAuthorizedTipView alloc] initNoneAuthViewWithFrame:self.view.bounds];
-        _noneAuthorizedTipView.hidden = YES;
-    }
-    return _noneAuthorizedTipView;
-}
-
-- (CATAuthorizedTipView *)limitAuthorizedTipView {
-    if (!_limitAuthorizedTipView) {
-        _limitAuthorizedTipView = [[CATAuthorizedTipView alloc] initLimitAuthViewWithFrame:self.view.bounds];
-        _limitAuthorizedTipView.hidden = YES;
-        
-        @weakify(self);
-        _limitAuthorizedTipView.handleAction = ^{
-            @strongify(self);
-            [self handleContinueLimitAuth];
-        };
-    }
-    return _limitAuthorizedTipView;
-}
-
 #pragma mark - Private
 
 /// 是否自动进入全部照片相册
@@ -203,9 +156,9 @@
     return (((CATPhotoPickerController *)self.navigationController).autoIntoLibrary);
 }
 
-/// 是否自动进入全部照片相册
+/// 相册列表标题
 - (NSString *)barTitle {
-    return (((CATPhotoPickerController *)self.navigationController).title);
+    return @"选择相册";
 }
 
 - (void)pushPhotoControllerAlbum:(CATAlbum *)album animated:(BOOL)animated {
@@ -254,5 +207,67 @@
     }
     
 }
+
+
+#pragma mark - Getter
+
+- (NSMutableArray<CATAlbum *> *)albums {
+    if (!_albums) {
+        _albums = [[NSMutableArray alloc] init];
+    }
+    return _albums;
+}
+
+- (UITableView *)albumTableView {
+    if (!_albumTableView) {
+        _albumTableView = [[UITableView alloc] initWithFrame:self.view.bounds style:UITableViewStylePlain];
+        _albumTableView.backgroundColor = [UIColor clearColor];
+        _albumTableView.delegate = self;
+        _albumTableView.dataSource = self;
+        _albumTableView.cellLayoutMarginsFollowReadableWidth = NO;
+        _albumTableView.estimatedRowHeight = 0;
+        _albumTableView.separatorStyle = UITableViewCellSeparatorStyleNone;
+        _albumTableView.estimatedSectionHeaderHeight = 0;
+        _albumTableView.estimatedSectionFooterHeight = 0;
+        _albumTableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+        _albumTableView.hidden = YES;
+    }
+    return _albumTableView;
+}
+
+- (UIActivityIndicatorView *)loadingView {
+    if (!_loadingView) {
+        if (@available(iOS 13.0, *)) {
+            _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
+        } else {
+            _loadingView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+        }
+        _loadingView.hidden = YES;
+    }
+    return _loadingView;
+}
+
+- (CATAuthorizedTipView *)noneAuthorizedTipView {
+    if (!_noneAuthorizedTipView) {
+        _noneAuthorizedTipView = [[CATAuthorizedTipView alloc] initWithAuthorizedType:CATAuthorizedTipNone];
+        _noneAuthorizedTipView.hidden = YES;
+    }
+    return _noneAuthorizedTipView;
+}
+
+- (CATAuthorizedTipView *)limitAuthorizedTipView {
+    if (!_limitAuthorizedTipView) {
+        _limitAuthorizedTipView = [[CATAuthorizedTipView alloc] initWithAuthorizedType:CATAuthorizedTipLimit];
+        _limitAuthorizedTipView.hidden = YES;
+        
+        @weakify(self);
+        _limitAuthorizedTipView.handleAction = ^{
+            @strongify(self);
+            [self handleContinueLimitAuth];
+        };
+    }
+    return _limitAuthorizedTipView;
+}
+
 
 @end

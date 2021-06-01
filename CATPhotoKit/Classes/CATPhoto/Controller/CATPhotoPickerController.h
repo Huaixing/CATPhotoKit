@@ -25,6 +25,12 @@ typedef NS_ENUM(NSInteger, CATPickMode) {
 /// @param selectedPhotos photos
 - (void)photoPickerController:(CATPhotoPickerController *)pickerController didFinishPickPhotos:(NSArray<CATPhoto *> *)selectedPhotos;
 
+
+/// 选择照片，点击预览，传给delegate，delegate需要执行dismiss
+/// @param pickerController navi picker
+/// @param selectedPhotos photos
+- (void)photoPickerController:(CATPhotoPickerController *)pickerController didFinishPreviewPhotos:(NSArray<CATPhoto *> *)selectedPhotos;
+
 @end
 
 @interface CATPhotoPickerController : UINavigationController

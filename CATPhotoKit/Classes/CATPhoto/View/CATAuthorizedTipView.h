@@ -7,13 +7,17 @@
 
 #import <UIKit/UIKit.h>
 
+
+typedef NS_ENUM(NSInteger, CATAuthorizedTipType) {
+    CATAuthorizedTipNone,
+    CATAuthorizedTipLimit,
+};
+
 typedef void(^CATHandleContinueLimitAction)(void);
+
 @interface CATAuthorizedTipView : UIView
 
-- (instancetype)initNoneAuthViewWithFrame:(CGRect)frame;
-
-
 @property (nonatomic, copy) CATHandleContinueLimitAction handleAction;
-- (instancetype)initLimitAuthViewWithFrame:(CGRect)frame;
+- (instancetype)initWithAuthorizedType:(CATAuthorizedTipType)type;
 @end
 

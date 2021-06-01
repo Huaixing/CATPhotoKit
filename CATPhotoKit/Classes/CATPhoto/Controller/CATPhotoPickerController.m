@@ -7,6 +7,7 @@
 //
 
 #import "CATPhotoPickerController.h"
+#import "CATPhotoBaseViewController.h"
 
 @interface CATPhotoPickerController ()
 
@@ -33,6 +34,10 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    self.navigationBar.hidden = YES;
+    
+    /// 下面的代码也能隐藏导航栏，但会使滑动返回失效
+    //self.navigationBarHidden = YES;
 }
 
 #pragma mark - Private
@@ -48,6 +53,12 @@
 - (void)photoViewControllerDidFinishPickPhotos:(NSArray<CATPhoto *> *)photos {
     if (self.picker && [self.picker respondsToSelector:@selector(photoPickerController:didFinishPickPhotos:)]) {
         [self.picker photoPickerController:self didFinishPickPhotos:photos];
+    }
+}
+
+- (void)photoViewControllerDidPreviewPhotos:(NSArray<CATPhoto *> *)photos {
+    if (self.picker && [self.picker respondsToSelector:@selector(photoPickerController:didFinishPreviewPhotos:)]) {
+        [self.picker photoPickerController:self didFinishPreviewPhotos:photos];
     }
 }
 

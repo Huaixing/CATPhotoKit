@@ -39,20 +39,17 @@
         _photoView.clipsToBounds = YES;
         [self.contentView addSubview:_photoView];
         
-        CGFloat checkButtonWidth = CGRectGetWidth(self.frame) * 2 / 5.0;
-        CGFloat checkButtonHeight = CGRectGetHeight(self.frame) * 2 / 5.0;
-        _checkButton = [[UIButton alloc] initWithFrame:CGRectMake(CGRectGetWidth(self.frame) - checkButtonWidth, 0, checkButtonWidth, checkButtonHeight)];
+        CGFloat checkButtonWidth = self.width * 2 / 5.0;
+        CGFloat checkButtonHeight = self.height * 2 / 5.0;
+        _checkButton = [[UIButton alloc] initWithFrame:CGRectMake(self.width - checkButtonWidth, 0, checkButtonWidth, checkButtonHeight)];
         _checkButton.backgroundColor = [UIColor clearColor];
         [_checkButton addTarget:self action:@selector(checkButtonDidClick) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:_checkButton];
         
         UIImage *image = [UIImage imageWithName:@"cat_photo_kit_photo_unselected_icon"];
         _checkView = [[UIImageView alloc] initWithImage:image];
-        
-        CGRect checkFrame = _checkView.frame;
-        checkFrame.origin.x = CGRectGetWidth(_checkButton.frame) - CGRectGetWidth(_checkView.frame) - 6;
-        checkFrame.origin.y = CGRectGetHeight(_checkButton.frame) - CGRectGetHeight(_checkView.frame) - 6;
-        _checkView.frame = checkFrame;
+        _checkView.y = 6;
+        _checkView.right = _checkButton.width - 6;
         _checkView.backgroundColor = [UIColor clearColor];
         [_checkButton addSubview:_checkView];
         
@@ -62,11 +59,9 @@
 }
 
 - (void)createVideoInfoView {
-    _videoInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, CGRectGetWidth(self.frame), 20)];
+    _videoInfoView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.width, 20)];
     _videoInfoView.backgroundColor = [UIColor clearColor];
-    CGRect vFrame = _videoInfoView.frame;
-    vFrame.origin.y = CGRectGetHeight(self.frame) - CGRectGetHeight(_videoInfoView.frame);
-    _videoInfoView.frame = vFrame;
+    _videoInfoView.bottom = self.height;
     [self.contentView addSubview:_videoInfoView];
     
     CAGradientLayer *gradientLayer = [CAGradientLayer layer];
@@ -81,17 +76,13 @@
     _videoIconView = [[UIImageView alloc] initWithImage:[UIImage imageWithName:@"cat_photo_thumb_video_media_icon"]];
     _videoIconView.backgroundColor = [UIColor clearColor];
     
-    CGRect vIconFrame = _videoIconView.frame;
-    vIconFrame.origin.x = 6;
-    _videoIconView.frame = vIconFrame;
+    _videoIconView.x = 6;
     
-    CGPoint vIconCenter = _videoIconView.center;
-    vIconCenter.y = CGRectGetHeight(_videoInfoView.frame) / 2.0;
-    _videoIconView.center = vIconCenter;
+    _videoIconView.centerY = _videoInfoView.height / 2.0;
     
     [_videoInfoView addSubview:_videoIconView];
     
-    _videoDurationLabel = [[UILabel alloc] initWithFrame:CGRectMake(CGRectGetMaxX(_videoIconView.frame) + 6, 0, CGRectGetWidth(_videoInfoView.frame) - (CGRectGetMaxX(_videoIconView.frame) + 6), CGRectGetHeight(_videoInfoView.frame))];
+    _videoDurationLabel = [[UILabel alloc] initWithFrame:CGRectMake(_videoIconView.right + 6, 0, _videoInfoView.width - (_videoIconView.right + 6), _videoInfoView.height)];
     _videoDurationLabel.backgroundColor = [UIColor clearColor];
     _videoDurationLabel.textColor = [UIColor colorWithHexString:@"0xFFFFFF"];
     _videoDurationLabel.font = [UIFont systemFontOfSize:12.0];
@@ -105,7 +96,7 @@
     _photo = photo;
     
     __weak typeof(self) weakSelf = self;
-    [[CATPhotoManager shareManager] requestAssetImageWithPhoto:photo targetSize:_photoView.frame.size complete:^(UIImage *result, NSString *identifier) {
+    [[CATPhotoManager shareManager] requestAssetImageWithPhoto:photo targetSize:_photoView.size complete:^(UIImage *result, NSString *identifier) {
         if (identifier && result && [weakSelf.photo.localIdentifier isEqualToString:identifier]) {
             weakSelf.photoView.image = result;
         }

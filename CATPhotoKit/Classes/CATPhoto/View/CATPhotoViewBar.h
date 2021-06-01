@@ -16,6 +16,10 @@
 /// 点击done
 /// @param selectedBar self
 - (void)photoViewBarDidClickDone:(CATPhotoViewBar *)selectedBar;
+
+/// 点击预览
+/// @param selectedBar self
+- (void)photoViewBarDidClickPreview:(CATPhotoViewBar *)selectedBar;
 @end
 
 @interface CATPhotoViewBar : UIView
