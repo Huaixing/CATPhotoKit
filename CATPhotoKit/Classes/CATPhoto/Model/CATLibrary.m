@@ -39,7 +39,7 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
         3). PHImageRequestOptionsResizeModeExact: 返回一张低清图
  */
 
-@implementation CATPhotoFetchConfig
+@implementation CATPhotoFetchOption
 
 - (instancetype)init {
     if (self = [super init]) {
@@ -162,29 +162,29 @@ static long long PHAssetCollectionSubTypeRecentDelete = 1000000201;
     
 }
 
-- (void)fetchPhotosWithCollection:(PHAssetCollection *)colletion config:(CATPhotoFetchConfig *)config handler:(void(^)(NSArray<CATPhoto *> *photos))handler {
+- (void)fetchPhotosWithCollection:(PHAssetCollection *)colletion option:(CATPhotoFetchOption *)option handler:(void(^)(NSArray<CATPhoto *> *photos))handler {
     
-    if (config == nil) {
-        config = [[CATPhotoFetchConfig alloc] init];
+    if (option == nil) {
+        option = [[CATPhotoFetchOption alloc] init];
     }
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
         NSMutableArray *localPhotos = [NSMutableArray array];
         
-        PHFetchOptions *options = [[PHFetchOptions alloc] init];
-        if (config.sortType == CATPhotoFetchSortTypeAscending) {
-            options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
-        } else if (config.sortType == CATPhotoFetchSortTypeDescending) {
-            options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
+        PHFetchOptions *fetchOptions = [[PHFetchOptions alloc] init];
+        if (option.sortType == CATPhotoFetchSortTypeAscending) {
+            fetchOptions.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES]];
+        } else if (option.sortType == CATPhotoFetchSortTypeDescending) {
+            fetchOptions.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
         }
-        if (config.mediaType == CATPhotoFetchMediaTypeImage) {
-            options.predicate = [NSPredicate predicateWithFormat:@"(mediaType = %d)", PHAssetMediaTypeImage];
-        } else if (config.mediaType == CATPhotoFetchMediaTypeVideo) {
-            options.predicate = [NSPredicate predicateWithFormat:@"(mediaType = %d)", PHAssetMediaTypeVideo];
+        if (option.mediaType == CATPhotoFetchMediaTypeImage) {
+            fetchOptions.predicate = [NSPredicate predicateWithFormat:@"(mediaType = %d)", PHAssetMediaTypeImage];
+        } else if (option.mediaType == CATPhotoFetchMediaTypeVideo) {
+            fetchOptions.predicate = [NSPredicate predicateWithFormat:@"(mediaType = %d)", PHAssetMediaTypeVideo];
         }
         
-        PHFetchResult<PHAsset *> *fetchAssetResult = [PHAsset fetchAssetsInAssetCollection:colletion options:options];
+        PHFetchResult<PHAsset *> *fetchAssetResult = [PHAsset fetchAssetsInAssetCollection:colletion options:fetchOptions];
         if (fetchAssetResult.count) {
             
             [fetchAssetResult enumerateObjectsUsingBlock:^(PHAsset * _Nonnull asset, NSUInteger idx, BOOL * _Nonnull stop) {

@@ -30,7 +30,7 @@ typedef void (^CATCompleteHandler)(UIImage *result, NSString *identifier);
 
 
 
-@interface CATPhotoFetchConfig : NSObject
+@interface CATPhotoFetchOption : NSObject
 /**media type*/
 @property (nonatomic, assign) CATPhotoFetchMediaType mediaType;
 @property (nonatomic, assign) CATPhotoFetchSortType sortType;
@@ -49,7 +49,7 @@ typedef void (^CATCompleteHandler)(UIImage *result, NSString *identifier);
 + (instancetype)shareManager;
 
 - (void)fetchAlbumsWithAfterSmartAlbumUserLibraryHandler:(void(^)(NSArray<CATAlbum *> *albums))handler complete:(void(^)(NSArray<CATAlbum *> *albums))complete;
-- (void)fetchPhotosWithCollection:(PHAssetCollection *)colletion config:(CATPhotoFetchConfig *)config handler:(void(^)(NSArray<CATPhoto *> *photos))handler;
+- (void)fetchPhotosWithCollection:(PHAssetCollection *)colletion option:(CATPhotoFetchOption *)option handler:(void(^)(NSArray<CATPhoto *> *photos))handler;
 
 - (void)requestAlbumThumbWithAlbum:(CATAlbum *)album targetSize:(CGSize)targetSize complete:(CATCompleteHandler)complete;
 - (void)requestAssetImageWithPhoto:(CATPhoto *)photo targetSize:(CGSize)targetSize complete:(CATCompleteHandler)complete;

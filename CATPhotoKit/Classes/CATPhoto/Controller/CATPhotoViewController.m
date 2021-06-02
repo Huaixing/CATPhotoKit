@@ -66,7 +66,7 @@
     _space = [self betweenSpace];
     
     @weakify(self);
-    [[CATPhotoManager shareManager] fetchPhotosWithCollection:_album.collection config:nil handler:^(NSArray<CATPhoto *> *photos) {
+    [[CATPhotoManager shareManager] fetchPhotosWithCollection:_album.collection option:nil handler:^(NSArray<CATPhoto *> *photos) {
         @strongify(self);
         if (!self) return;
         [self.photos removeAllObjects];
