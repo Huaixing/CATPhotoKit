@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = "CATPhotoKit"
-  s.version          = "0.1.8"
+  s.version          = "0.1.9"
   s.summary          = "kit of access local library in project."
   s.description      = <<-DESC
 kit of access local library in cat project, upload appstore
